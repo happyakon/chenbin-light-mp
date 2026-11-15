@@ -28,3 +28,7 @@ shots/mp-proto/*.png
 # 小程序 AppSecret 只放在后端环境变量里，绝不能进代码库
 .env
 .env.*
+
+# ---------------------------------------------------------------- 开发者工具自动生成
+# 里面含有真实 AppID，不提交到公开仓库
+miniprogram/project.config.json
