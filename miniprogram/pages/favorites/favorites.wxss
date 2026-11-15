@@ -1,0 +1,85 @@
+/* 收藏 / 点赞 列表 —— 3 列瀑布流 */
+
+.list-page {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: #0d0d0d;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-bar {
+  flex: 0 0 auto;
+}
+
+.nav {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 16rpx 28rpx 28rpx;
+  gap: 16rpx;
+}
+
+.back {
+  width: 56rpx;
+  font-size: 44rpx;
+  color: #c8c6c1;
+  line-height: 1;
+  padding-bottom: 6rpx;
+}
+
+.title {
+  flex: 1;
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 36rpx;
+  letter-spacing: 0.1em;
+  color: #f0efec;
+}
+
+.count {
+  font-size: 22rpx;
+  color: #5a5956;
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+/* 3 列瀑布流 */
+.masonry {
+  display: flex;
+  gap: 8rpx;
+  padding: 0 20rpx calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.m-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  min-width: 0;
+}
+
+.m-item {
+  width: 100%;
+  border-radius: 6rpx;
+  overflow: hidden;
+  background: #141414;
+}
+
+.m-img {
+  width: 100%;
+  display: block;
+}
+
+.state-hint {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  letter-spacing: 0.06em;
+  color: #3d3c3a;
+  text-align: center;
+}

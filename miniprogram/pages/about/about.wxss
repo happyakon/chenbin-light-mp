@@ -1,0 +1,130 @@
+/* 关于 */
+
+.about-page {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: #0d0d0d;
+  overflow-y: auto;
+  padding-bottom: 60rpx;
+}
+
+.status-bar {
+  flex: 0 0 auto;
+}
+
+/* 头部 */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 40rpx 72rpx;
+}
+
+.avatar {
+  width: 176rpx;
+  height: 176rpx;
+  border-radius: 50%;
+  border: 1rpx solid rgba(201, 168, 106, 0.24);
+  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.5);
+}
+
+.avatar-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #161616;
+  font-size: 64rpx;
+  filter: grayscale(1);
+  opacity: 0.4;
+}
+
+.name {
+  margin-top: 32rpx;
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 44rpx;
+  letter-spacing: 0.1em;
+  color: #f0efec;
+}
+
+.tagline {
+  margin-top: 14rpx;
+  font-size: 24rpx;
+  letter-spacing: 0.08em;
+  color: #8a8884;
+}
+
+/* 段落 */
+.section {
+  padding: 0 40rpx 56rpx;
+}
+
+.section-title {
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 26rpx;
+  letter-spacing: 0.14em;
+  color: #8a8884;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid rgba(240, 239, 236, 0.07);
+  margin-bottom: 28rpx;
+}
+
+.bio {
+  font-size: 28rpx;
+  line-height: 2.1;
+  letter-spacing: 0.04em;
+  color: #c8c6c1;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 联系方式 */
+.contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid rgba(240, 239, 236, 0.04);
+}
+
+.ct-label {
+  font-size: 26rpx;
+  letter-spacing: 0.06em;
+  color: #5a5956;
+  flex: 0 0 auto;
+  width: 120rpx;
+}
+
+.ct-value {
+  flex: 1;
+  text-align: right;
+  font-size: 26rpx;
+  letter-spacing: 0.02em;
+  color: #c8c6c1;
+  word-break: break-all;
+}
+
+.contact-hint {
+  margin-top: 20rpx;
+  font-size: 20rpx;
+  letter-spacing: 0.08em;
+  color: #3d3c3a;
+  text-align: center;
+}
+
+/* 版本 */
+.version {
+  padding: 40rpx 40rpx 0;
+  text-align: center;
+  font-size: 21rpx;
+  letter-spacing: 0.16em;
+  color: #3d3c3a;
+}

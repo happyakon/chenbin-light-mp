@@ -1,0 +1,76 @@
+<view class="collections-page">
+  <!-- 状态栏占位 -->
+  <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
+
+  <!-- 顶部标题 -->
+  <view class="page-head">
+    <view class="page-title">摄影集</view>
+  </view>
+
+  <!-- 横向筛选 chip -->
+  <scroll-view class="chips" scroll-x enable-flex show-scrollbar="{{false}}">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="key"
+      class="chip {{activeCollection === item.key ? 'is-active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onTabTap"
+    >
+      {{item.label}}
+    </view>
+  </scroll-view>
+
+  <!-- 加载骨架 -->
+  <scroll-view wx:if="{{loading}}" class="scroll-area" scroll-y>
+    <view class="grid">
+      <view wx:for="{{[1,2,3,4]}}" wx:key="*this" class="album skeleton-wrap">
+        <view class="cover skeleton"></view>
+        <view class="meta">
+          <view class="sk-line skeleton" style="width:60%"></view>
+          <view class="sk-line skeleton" style="width:40%"></view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 相册网格 -->
+  <scroll-view wx:else class="scroll-area" scroll-y>
+    <view wx:if="{{albums.length}}" class="grid">
+      <view
+        wx:for="{{albums}}"
+        wx:key="key"
+        class="album {{item.animIn ? 'is-in' : ''}} from-{{item.animFrom}}"
+        style="transition-delay:{{item.animDelay}}ms"
+        data-album="{{item}}"
+        bindtap="onAlbumTap"
+      >
+        <view class="cover-wrap">
+          <image
+            wx:if="{{item.coverUrl}}"
+            class="cover"
+            src="{{item.coverUrl}}"
+            mode="aspectFill"
+            lazy-load
+          />
+          <view wx:else class="cover cover-empty">
+            <view class="lock-icon">🔒</view>
+          </view>
+          <view class="cover-shade"></view>
+          <view wx:if="{{item.locked}}" class="badge">🔒</view>
+          <view class="cover-text">
+            <view class="cn">{{item.title}}</view>
+            <view wx:if="{{item.en}}" class="en">{{item.en}}</view>
+          </view>
+        </view>
+        <view class="count">{{item.count}} 张</view>
+      </view>
+    </view>
+
+    <view wx:else class="state-box">
+      <view class="state-dots">· · ·</view>
+      <view class="state-text">
+        {{activeCollection ? '这个摄影集还没有相册' : '还没有相册'}}
+      </view>
+    </view>
+  </scroll-view>
+</view>

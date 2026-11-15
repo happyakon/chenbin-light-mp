@@ -1,0 +1,120 @@
+/**
+ * 全局样式
+ * 与 Web 端保持同一套设计语言：暗调 + 金色
+ */
+
+page {
+  background: #0d0d0d;
+  color: #f0efec;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+view, text, scroll-view, swiper, swiper-item, image {
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------- 变量（用 class 模拟） */
+/* 小程序 WXSS 支持 CSS 变量，但 page 上定义更好 */
+
+page {
+  --bg: #0d0d0d;
+  --panel: #141414;
+  --line: rgba(240, 239, 236, 0.09);
+  --line-strong: rgba(240, 239, 236, 0.16);
+  --ink: #f0efec;
+  --ink-soft: #c8c6c1;
+  --muted: #8a8884;
+  --muted-deep: #5a5956;
+  --gold: #c9a86a;
+  --serif: "Songti SC", "SimSun", "Noto Serif CJK SC", serif;
+}
+
+/* ---------------------------------------------------------- 通用工具类 */
+
+.serif {
+  font-family: var(--serif);
+}
+
+.gold {
+  color: var(--gold);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.muted-deep {
+  color: var(--muted-deep);
+}
+
+/* 全屏容器 */
+.full {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+/* 中间态提示（加载/空/错误） */
+.state-box {
+  padding: 120rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20rpx;
+}
+
+.state-dots {
+  font-size: 26rpx;
+  letter-spacing: 0.4em;
+  color: var(--muted-deep);
+}
+
+.state-text {
+  font-size: 26rpx;
+  letter-spacing: 0.08em;
+  color: var(--muted-deep);
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* 骨架屏 */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 徽标 */
+.badge {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 52rpx;
+  height: 52rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10rpx);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  z-index: 5;
+}

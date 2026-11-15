@@ -1,0 +1,137 @@
+/* 相册解锁 */
+
+.unlock-page {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: #0d0d0d;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-bar {
+  flex: 0 0 auto;
+}
+
+.nav {
+  flex: 0 0 auto;
+  padding: 12rpx 20rpx;
+}
+
+.back {
+  width: 68rpx;
+  height: 68rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  color: #c8c6c1;
+  line-height: 1;
+  padding-bottom: 6rpx;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 88rpx 140rpx;
+}
+
+.lock-icon {
+  font-size: 76rpx;
+  margin-bottom: 40rpx;
+  opacity: 0.85;
+}
+
+.album-title {
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 48rpx;
+  letter-spacing: 0.14em;
+  color: #f0efec;
+  text-align: center;
+}
+
+.hint {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  letter-spacing: 0.06em;
+  color: #8a8884;
+  text-align: center;
+}
+
+.input-wrap {
+  width: 100%;
+  margin-top: 80rpx;
+}
+
+.input {
+  width: 100%;
+  height: 104rpx;
+  border: 1rpx solid rgba(240, 239, 236, 0.14);
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.02);
+  color: #f0efec;
+  font-size: 32rpx;
+  letter-spacing: 0.1em;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.input-ph {
+  color: #3d3c3a;
+  font-size: 28rpx;
+  letter-spacing: 0.06em;
+}
+
+/* 输错抖动 */
+.is-shake {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-14rpx); }
+  40% { transform: translateX(14rpx); }
+  60% { transform: translateX(-10rpx); }
+  80% { transform: translateX(10rpx); }
+}
+
+.submit {
+  width: 100%;
+  height: 100rpx;
+  margin-top: 32rpx;
+  border-radius: 16rpx;
+  border: 1rpx solid #c9a86a;
+  background: rgba(201, 168, 106, 0.1);
+  color: #c9a86a;
+  font-size: 30rpx;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  line-height: 98rpx;
+}
+
+.submit.is-disabled {
+  opacity: 0.4;
+}
+
+.warn {
+  margin-top: 48rpx;
+  font-size: 22rpx;
+  letter-spacing: 0.06em;
+  color: #5a5956;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.error {
+  margin-top: 48rpx;
+  font-size: 22rpx;
+  letter-spacing: 0.06em;
+  color: #d9705f;
+  text-align: center;
+  line-height: 1.7;
+}

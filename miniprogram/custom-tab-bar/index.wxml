@@ -1,0 +1,13 @@
+<!--
+  占位组件。
+  
+  为什么存在：
+    之前用过自定义 tabBar，后来改回原生（app.json 里 tabBar.custom = false），
+    但开发者工具会缓存目录结构，删掉文件夹后会一直报
+    ENOENT: no such file or directory ...custom-tab-bar\index.wxss
+    
+    保留这个空组件可以让工具不再报错。
+    因为 tabBar.custom = false，微信根本不会加载这个组件，
+    所以它的内容为空是完全没问题的。
+-->
+<view></view>

@@ -1,0 +1,56 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/collections/collections",
+    "pages/mine/mine",
+    "pages/about/about",
+    "pages/album/album",
+    "pages/unlock/unlock",
+    "pages/favorites/favorites",
+    "pages/likes/likes"
+  ],
+  "window": {
+    "backgroundColor": "#0d0d0d",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#0d0d0d",
+    "navigationBarTitleText": "陈彬拾光集",
+    "navigationBarTextStyle": "white",
+    "navigationStyle": "custom"
+  },
+  "tabBar": {
+    "custom": false,
+    "color": "#5a5956",
+    "selectedColor": "#c9a86a",
+    "backgroundColor": "#0d0d0d",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab-home.png",
+        "selectedIconPath": "images/tab-home-on.png"
+      },
+      {
+        "pagePath": "pages/collections/collections",
+        "text": "摄影集",
+        "iconPath": "images/tab-grid.png",
+        "selectedIconPath": "images/tab-grid-on.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "images/tab-user.png",
+        "selectedIconPath": "images/tab-user-on.png"
+      },
+      {
+        "pagePath": "pages/about/about",
+        "text": "关于",
+        "iconPath": "images/tab-info.png",
+        "selectedIconPath": "images/tab-info-on.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

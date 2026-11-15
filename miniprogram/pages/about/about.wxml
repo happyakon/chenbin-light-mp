@@ -1,0 +1,57 @@
+<view class="about-page">
+  <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="state-box">
+    <view class="state-dots">· · ·</view>
+  </view>
+
+  <!-- 未启用 -->
+  <view wx:elif="{{!enabled}}" class="state-box">
+    <view class="state-text">该页面暂未启用</view>
+  </view>
+
+  <!-- 关于内容 -->
+  <block wx:else>
+    <!-- 头部：头像 + 名字 + 身份 -->
+    <view class="hero">
+      <image
+        wx:if="{{avatarUrl}}"
+        class="avatar"
+        src="{{avatarUrl}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="avatar avatar-empty">👤</view>
+
+      <view wx:if="{{about.name}}" class="name">{{about.name}}</view>
+      <view wx:if="{{about.tagline}}" class="tagline">{{about.tagline}}</view>
+    </view>
+
+    <!-- 正文 -->
+    <view wx:if="{{about.bio}}" class="section">
+      <view class="section-title">关于我</view>
+      <view class="bio">{{about.bio}}</view>
+    </view>
+
+    <!-- 联系方式 -->
+    <view wx:if="{{about.contacts.length}}" class="section">
+      <view class="section-title">联系方式</view>
+      <view class="contacts">
+        <view
+          wx:for="{{about.contacts}}"
+          wx:key="index"
+          class="contact"
+          data-value="{{item.value}}"
+          bindtap="onContactTap"
+        >
+          <text class="ct-label">{{item.label}}</text>
+          <text class="ct-value">{{item.value}}</text>
+        </view>
+      </view>
+      <view class="contact-hint">点击可复制</view>
+    </view>
+
+    <!-- 版本 -->
+    <view class="version">陈彬拾光集 {{version}}</view>
+  </block>
+</view>

@@ -1,0 +1,43 @@
+<view class="unlock-page">
+  <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
+
+  <view class="nav">
+    <view class="back" bindtap="goBack">‹</view>
+  </view>
+
+  <view class="content">
+    <view class="lock-icon">🔒</view>
+
+    <view class="album-title">{{albumTitle || '该相册'}}</view>
+    <view class="hint">请输入密码后查看</view>
+
+    <view class="input-wrap {{shake ? 'is-shake' : ''}}">
+      <input
+        class="input"
+        type="text"
+        password
+        value="{{password}}"
+        placeholder="输入密码"
+        placeholder-class="input-ph"
+        confirm-type="done"
+        disabled="{{submitting || retryAfter > 0}}"
+        bindinput="onInput"
+        bindconfirm="onSubmit"
+        focus
+      />
+    </view>
+
+    <button
+      class="submit {{submitting || retryAfter > 0 ? 'is-disabled' : ''}}"
+      disabled="{{submitting || retryAfter > 0}}"
+      bindtap="onSubmit"
+    >
+      {{submitting ? '验证中…' : '进入'}}
+    </button>
+
+    <!-- 错误 / 锁定提示 -->
+    <view wx:if="{{retryAfter > 0}}" class="warn">{{lockText}}</view>
+    <view wx:elif="{{error}}" class="error">{{error}}</view>
+    <view wx:else class="warn">连续错误 5 次将锁定 4 小时</view>
+  </view>
+</view>

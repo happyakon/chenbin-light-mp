@@ -1,0 +1,163 @@
+<view class="album-page">
+  <!-- 顶部返回（仅全屏浏览模式显示，照片墙的返回在标题栏里） -->
+  <view
+    wx:if="{{mode === 'viewer'}}"
+    class="top-bar"
+    style="padding-top:{{statusBarHeight}}px"
+  >
+    <view class="back-btn" catchtap="goBack">‹</view>
+  </view>
+
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="state-box full-center">
+    <view class="state-dots">· · ·</view>
+    <view class="state-text">载入中</view>
+  </view>
+
+  <!-- 错误 -->
+  <view wx:elif="{{error}}" class="state-box full-center">
+    <view class="state-text">{{error}}</view>
+  </view>
+
+  <!-- ==================== 视图 1：封面 + 瀑布流 ==================== -->
+  <block wx:elif="{{mode === 'grid'}}">
+    <scroll-view class="wall-scroll" scroll-y>
+      <!-- 顶部大封面 -->
+      <view class="hero">
+        <image wx:if="{{coverUrl}}" class="hero-img" src="{{coverUrl}}" mode="aspectFill" />
+        <view wx:else class="hero-img hero-empty"></view>
+
+        <!-- 渐变遮罩，让文字看得清 -->
+        <view class="hero-mask"></view>
+
+        <!-- 返回键 -->
+        <view class="hero-back" style="top:{{statusBarHeight + 8}}px" catchtap="goBack">‹</view>
+
+        <!-- 标题叠在封面底部 -->
+        <view class="hero-text">
+          <view class="hero-title">{{albumTitle}}</view>
+          <view class="hero-count">{{photos.length}} 张图片</view>
+        </view>
+      </view>
+
+      <!-- 断点续看提示 -->
+      <view wx:if="{{showResumeTip}}" class="resume-tip">
+        <text class="rt-text">上次看到第 {{lastSeen + 1}} 张</text>
+        <view class="rt-btn" catchtap="onResumeTap">继续看</view>
+        <view class="rt-close" catchtap="onResumeClose">×</view>
+      </view>
+
+      <!-- 瀑布流（3 列） -->
+      <view class="masonry">
+        <view class="m-col">
+          <view
+            wx:for="{{col1}}"
+            wx:key="path"
+            class="m-item"
+            data-index="{{item.index}}"
+            bindtap="onGridPhotoTap"
+          >
+            <image class="m-img" src="{{item.thumbUrl}}" mode="widthFix" lazy-load />
+          </view>
+        </view>
+        <view class="m-col">
+          <view
+            wx:for="{{col2}}"
+            wx:key="path"
+            class="m-item"
+            data-index="{{item.index}}"
+            bindtap="onGridPhotoTap"
+          >
+            <image class="m-img" src="{{item.thumbUrl}}" mode="widthFix" lazy-load />
+          </view>
+        </view>
+        <view class="m-col">
+          <view
+            wx:for="{{col3}}"
+            wx:key="path"
+            class="m-item"
+            data-index="{{item.index}}"
+            bindtap="onGridPhotoTap"
+          >
+            <image class="m-img" src="{{item.thumbUrl}}" mode="widthFix" lazy-load />
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </block>
+
+  <!-- ==================== 视图 2：全屏沉浸浏览 ==================== -->
+  <block wx:else>
+    <!-- 照片区 -->
+    <view
+      class="stage {{expanded ? 'is-expanded' : ''}}"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+      bindtap="onTapPhoto"
+      bindlongpress="onLongPress"
+    >
+      <swiper
+        class="photo-swiper"
+        current="{{current}}"
+        bindchange="onSwiperChange"
+        duration="240"
+        circular="{{false}}"
+      >
+        <swiper-item wx:for="{{photos}}" wx:key="path">
+          <view class="photo-box">
+            <image class="photo thumb" src="{{item.thumbUrl}}" mode="aspectFit" lazy-load />
+            <image class="photo medium" src="{{item.mediumUrl}}" mode="aspectFit" lazy-load />
+          </view>
+        </swiper-item>
+      </swiper>
+
+      <!-- 上滑提示 -->
+      <view wx:if="{{!expanded}}" class="slide-hint">
+        <view class="hint-arrow">⌃</view>
+        <view class="hint-text">上滑看参数</view>
+      </view>
+    </view>
+
+    <!-- EXIF 面板 -->
+    <view class="exif-panel {{expanded ? 'is-open' : ''}} {{dragging ? 'is-dragging' : ''}}">
+      <view class="panel-handle" bindtap="onTapPhoto">
+        <view class="panel-bar"></view>
+      </view>
+      <scroll-view class="exif-scroll" scroll-y>
+        <view wx:if="{{noExif}}" class="no-exif">无参数信息</view>
+        <view wx:else class="exif-list">
+          <view
+            wx:for="{{exifList}}"
+            wx:key="key"
+            class="exif-row {{item.wide ? 'is-wide' : ''}}"
+          >
+            <text class="ek">{{item.label}}</text>
+            <text class="ev">{{item.value}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 底部信息条 -->
+    <view class="info-bar {{expanded ? 'is-up' : ''}}">
+      <view class="info-left">
+        <text class="album-name">{{albumTitle}}</text>
+        <text class="counter">{{current + 1}} / {{photos.length}}</text>
+      </view>
+      <view class="info-right">
+        <view class="act" catchtap="toggleLike">
+          <text class="act-icon {{photos[current].liked ? 'is-liked' : ''}}">
+            {{photos[current].liked ? '♥' : '♡'}}
+          </text>
+          <text class="act-num">{{photos[current].likeCount || 0}}</text>
+        </view>
+        <view class="act" catchtap="toggleFavorite">
+          <text class="act-icon {{photos[current].favorited ? 'is-faved' : ''}}">
+            {{photos[current].favorited ? '★' : '☆'}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

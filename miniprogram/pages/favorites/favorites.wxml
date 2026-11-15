@@ -1,0 +1,57 @@
+<view class="list-page">
+  <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
+
+  <view class="nav">
+    <view class="back" bindtap="goBack">‹</view>
+    <view class="title">{{title}}</view>
+    <view class="count">{{photos.length}} 张</view>
+  </view>
+
+  <scroll-view wx:if="{{!loading}}" class="scroll" scroll-y>
+    <view wx:if="{{photos.length}}" class="masonry">
+      <view class="m-col">
+        <view
+          wx:for="{{col1}}"
+          wx:key="path"
+          class="m-item"
+          data-photo="{{item}}"
+          bindtap="onPhotoTap"
+        >
+          <image class="m-img" src="{{item.thumbUrl}}" mode="widthFix" lazy-load />
+        </view>
+      </view>
+      <view class="m-col">
+        <view
+          wx:for="{{col2}}"
+          wx:key="path"
+          class="m-item"
+          data-photo="{{item}}"
+          bindtap="onPhotoTap"
+        >
+          <image class="m-img" src="{{item.thumbUrl}}" mode="widthFix" lazy-load />
+        </view>
+      </view>
+      <view class="m-col">
+        <view
+          wx:for="{{col3}}"
+          wx:key="path"
+          class="m-item"
+          data-photo="{{item}}"
+          bindtap="onPhotoTap"
+        >
+          <image class="m-img" src="{{item.thumbUrl}}" mode="widthFix" lazy-load />
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="state-box">
+      <view class="state-dots">· · ·</view>
+      <view class="state-text">{{emptyText}}</view>
+      <view class="state-hint">{{emptyHint}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:else class="state-box">
+    <view class="state-dots">· · ·</view>
+  </view>
+</view>

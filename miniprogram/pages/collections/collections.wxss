@@ -1,0 +1,219 @@
+/* 摄影集页 —— 顶部横向筛选 + 相册双列网格 */
+
+.collections-page {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d0d;
+  overflow: hidden;
+}
+
+.status-bar {
+  flex: 0 0 auto;
+}
+
+/* ---------------------------------------------------------- 顶部标题 */
+
+.page-head {
+  flex: 0 0 auto;
+  padding: 20rpx 36rpx 20rpx;
+}
+
+.page-title {
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 44rpx;
+  letter-spacing: 0.16em;
+  color: #f0efec;
+}
+
+/* ---------------------------------------------------------- 横向筛选 chip */
+
+.chips {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  padding: 0 36rpx 24rpx;
+  display: flex;
+  box-sizing: border-box;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  height: 60rpx;
+  padding: 0 28rpx;
+  margin-right: 16rpx;
+  border-radius: 30rpx;
+  border: 1rpx solid rgba(240, 239, 236, 0.1);
+  font-size: 24rpx;
+  letter-spacing: 0.04em;
+  color: #8a8884;
+  transition: all 0.24s ease;
+}
+
+.chip.is-active {
+  border-color: #c9a86a;
+  color: #c9a86a;
+  background: rgba(201, 168, 106, 0.1);
+}
+
+/* ---------------------------------------------------------- 滚动区 */
+
+.scroll-area {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 40rpx;
+  box-sizing: border-box;
+}
+
+/* ---------------------------------------------------------- 相册网格 */
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 28rpx;
+  box-sizing: border-box;
+}
+
+.album {
+  /*
+   * 双列布局，宽度必须算上 margin-right，否则总宽超 50% 会掉成单列。
+   * padding 28×2 = 56，间距 16，所以单列 = (100% - 72) / 2
+   */
+  width: calc((100% - 72rpx) / 2);
+  margin-bottom: 22rpx;
+  opacity: 0;
+  transform: translate(0, 24rpx) scale(0.94);
+  transition: opacity 0.4s ease-out, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 左列留间距 */
+.album:nth-child(odd) {
+  margin-right: 16rpx;
+}
+
+/* 奇偶方向不同，制造错落感 */
+.album.from-left {
+  transform: translate(-8rpx, 24rpx) scale(0.94);
+}
+
+.album.from-right {
+  transform: translate(8rpx, 24rpx) scale(0.94);
+}
+
+.album.is-in {
+  opacity: 1;
+  transform: translate(0, 0) scale(1);
+}
+
+.cover-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border-radius: 8rpx;
+  overflow: hidden;
+  background: #141414;
+  box-shadow: 0 6rpx 28rpx rgba(0, 0, 0, 0.5);
+}
+
+.cover {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #141414;
+}
+
+.lock-icon {
+  font-size: 56rpx;
+  opacity: 0.5;
+}
+
+.cover-shade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 55%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.15) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.cover-text {
+  position: absolute;
+  left: 20rpx;
+  right: 20rpx;
+  bottom: 18rpx;
+  z-index: 2;
+}
+
+.cn {
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 32rpx;
+  letter-spacing: 0.08em;
+  color: #fff;
+  text-shadow: 0 2rpx 16rpx rgba(0, 0, 0, 0.8);
+  line-height: 1.3;
+}
+
+.en {
+  margin-top: 6rpx;
+  font-size: 17rpx;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+}
+
+.badge {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10rpx);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  z-index: 3;
+}
+
+.count {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  letter-spacing: 0.06em;
+  color: #5a5956;
+}
+
+/* ---------------------------------------------------------- 骨架屏 */
+
+.skeleton-wrap {
+  opacity: 1;
+  transform: none;
+}
+
+.sk-line {
+  height: 20rpx;
+  border-radius: 4rpx;
+  margin-top: 12rpx;
+}
+
+.meta {
+  padding: 0 4rpx;
+}
