@@ -67,6 +67,9 @@ Page({
       const info = (app && app.globalData.sysInfo) || wx.getWindowInfo();
       if (info) {
         this.setData({ statusBarHeight: info.statusBarHeight || 20 });
+        // 记下屏幕尺寸，算展开态容器宽度时要用
+        this._winWidth = info.windowWidth || 375;
+        this._winHeight = info.windowHeight || 667;
       }
     } catch (_) {}
 
@@ -108,7 +111,12 @@ Page({
         originalUrl: imgUrl(p.original, album),
         // 照片墙用的宽高比（后端有 width/height）
         ratio: p.width && p.height ? p.height / p.width : 1.33,
+        // 原始宽高比（宽 / 高），用于计算展开态的容器宽度
+        aspect: p.width && p.height ? p.width / p.height : 0.75,
       }));
+
+      // 算出展开态容器尺寸（避免上滑后两侧黑框）
+      const photosWithStyle = this.computeExpandedStyle(photos);
 
       if (!photos.length) {
         this.setData({ loading: false, error: '这个相册还没有照片' });
@@ -121,7 +129,7 @@ Page({
           (p) => p.file === focusFile || p.path.endsWith(focusFile)
         );
         this.setData({
-          photos,
+          photos: photosWithStyle,
           albumTitle: (data.album && data.album.title) || album,
           coverUrl: this.resolveCover(data.album, photos),
           loading: false,
@@ -139,7 +147,7 @@ Page({
       const cols = this.splitColumns(photos);
 
       this.setData({
-        photos,
+        photos: photosWithStyle,
         col1: cols[0],
         col2: cols[1],
         col3: cols[2],
@@ -210,6 +218,53 @@ Page({
       return photos[0].mediumUrl || photos[0].thumbUrl;
     }
     return '';
+  },
+
+  /* ---------------------------------------------------------- 展开态布局 */
+
+  /**
+   * 计算展开态下每张照片的容器样式。
+   *
+   * ★ 为什么需要：
+   *   展开后照片区高度只有屏幕的 52%，宽度还是全屏。
+   *   竖图（如 2:3）用 aspectFit 适配高度后，实际宽度只有
+   *   屏幕宽度的 55% 左右，两侧就露出黑边，很难看。
+   *
+   * ★ 解决：
+   *   让容器自己收缩成「和图片一样的比例」。
+   *   容器宽 = 可用高度 × 图片宽高比，且不超过屏幕宽度。
+   *   容器宽高比 = 图片宽高比 → aspectFit 时图片正好填满容器，没有黑边。
+   *
+   * 例：屏幕 390×844，展开高度 844×0.52 = 439
+   *   · 竖图 2:3（aspect 0.667）→ 宽 = 439 × 0.667 = 293 < 390 → 容器 293×439
+   *   · 横图 3:2（aspect 1.5）  → 宽 = 439 × 1.5 = 658 > 390 → 容器 390×260
+   *     （横图受宽度限制，高度只有 260，容器居中，上下留黑边是正常的）
+   *
+   * @param {Array} photos
+   * @returns {Array} 每项加上 expandStyle 字段
+   */
+  computeExpandedStyle(photos) {
+    const stageH = Math.round((this._winHeight || 667) * 0.52);
+    const stageW = this._winWidth || 375;
+
+    return photos.map((p) => {
+      const aspect = p.aspect || 0.75; // 宽 / 高
+
+      // 先按高度算宽度
+      let w = stageH * aspect;
+      let h = stageH;
+
+      // 如果超过屏幕宽度，说明是横图 → 改成按宽度算高度
+      if (w > stageW) {
+        w = stageW;
+        h = stageW / aspect;
+      }
+
+      return {
+        ...p,
+        expandStyle: `width:${Math.round(w)}px;height:${Math.round(h)}px;`,
+      };
+    });
   },
 
   /* ---------------------------------------------------------- 断点续看 */

@@ -105,7 +105,15 @@
         circular="{{false}}"
       >
         <swiper-item wx:for="{{photos}}" wx:key="path">
-          <view class="photo-box">
+          <!--
+            展开态：容器宽度按图片比例收缩，图片填满容器 → 不会有两边黑框。
+            计算见 album.js 的 computeExpandedStyle()。
+            收起态：容器占满整屏，aspectFit 居中，两侧黑边是正常观感。
+          -->
+          <view
+            class="photo-box {{expanded ? 'is-expanded' : ''}}"
+            style="{{expanded ? item.expandStyle : ''}}"
+          >
             <image class="photo thumb" src="{{item.thumbUrl}}" mode="aspectFit" lazy-load />
             <image class="photo medium" src="{{item.mediumUrl}}" mode="aspectFit" lazy-load />
           </view>
