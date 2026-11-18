@@ -262,28 +262,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /*
-   * 展开态时容器会按图片比例收缩（宽度由 JS 算好写在 inline style 里），
-   * 收缩后要水平居中，否则会贴在左边。
-   */
-  margin: 0 auto;
-  transition: width 0.26s cubic-bezier(0.16, 1, 0.3, 1),
-    height 0.26s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/*
- * 展开态：
- * 宽度和高度由 JS 按图片比例算好（inline style），
- * 容器比例 = 图片比例 → aspectFit 正好填满，没有黑边。
- *
- * 拖动过程中不播放过渡，保持跟手。
- */
-.photo-box.is-expanded {
-  /* 宽度高度都来自 inline style，这里不设值 */
-}
-
-.stage.is-dragging .photo-box {
-  transition: none;
+  /* 容器始终占满照片区，图片用 aspectFit/aspectFill 自己适配 */
+  overflow: hidden;
 }
 
 .photo {

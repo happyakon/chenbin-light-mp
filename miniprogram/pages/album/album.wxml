@@ -106,16 +106,31 @@
       >
         <swiper-item wx:for="{{photos}}" wx:key="path">
           <!--
-            展开态：容器宽度按图片比例收缩，图片填满容器 → 不会有两边黑框。
-            计算见 album.js 的 computeExpandedStyle()。
-            收起态：容器占满整屏，aspectFit 居中，两侧黑边是正常观感。
+            照片模式：
+              收起态 = aspectFit（完整显示，两侧或上下留黑边，看全图）
+              展开态 = aspectFill（铺满区域，超出部分裁掉）
+
+            为什么展开态要用 aspectFill：
+              展开后照片区变成矮宽的 390×439。
+              · 竖图用 aspectFit 会缩成 293×439，两侧露黑框 → 难看
+              · 改用 aspectFill 则铺满，上下被裁掉一部分 → 视觉饱满
+
+              参考用户给的手机相册截图：竖图上滑时宽度不变、上下被遮；
+              横图上滑时高度铺满、左右被遮。这就是 aspectFill 的行为。
           -->
-          <view
-            class="photo-box {{expanded ? 'is-expanded' : ''}}"
-            style="{{expanded ? item.expandStyle : ''}}"
-          >
-            <image class="photo thumb" src="{{item.thumbUrl}}" mode="aspectFit" lazy-load />
-            <image class="photo medium" src="{{item.mediumUrl}}" mode="aspectFit" lazy-load />
+          <view class="photo-box {{expanded ? 'is-expanded' : ''}}">
+            <image
+              class="photo thumb"
+              src="{{item.thumbUrl}}"
+              mode="{{expanded ? 'aspectFill' : 'aspectFit'}}"
+              lazy-load
+            />
+            <image
+              class="photo medium"
+              src="{{item.mediumUrl}}"
+              mode="{{expanded ? 'aspectFill' : 'aspectFit'}}"
+              lazy-load
+            />
           </view>
         </swiper-item>
       </swiper>

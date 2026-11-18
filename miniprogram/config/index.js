@@ -15,7 +15,7 @@ const CONFIG = {
   local: {
     // 本地开发：后端跑在电脑上，手机和电脑连同一 WiFi
     // 用局域网 IP，不要用 localhost（手机访问不到）
-    baseUrl: 'http://127.0.0.1:3000',
+    baseUrl: 'http://39.107.230.253:3000',
     // 域名校验：开发者工具里可以关，真机不行
     debug: true,
   },
