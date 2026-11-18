@@ -32,3 +32,6 @@ shots/mp-proto/*.png
 # ---------------------------------------------------------------- 开发者工具自动生成
 # 里面含有真实 AppID，不提交到公开仓库
 miniprogram/project.config.json
+
+# 临时提交信息
+.commitmsg
