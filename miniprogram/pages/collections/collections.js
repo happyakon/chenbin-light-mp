@@ -61,7 +61,15 @@ Page({
             ...a,
             collectionKey: col.key,
             collectionTitle: col.title,
-            coverUrl: a.cover ? imgUrl(a.cover) : '',
+            /*
+             * ★ 必须把 a.key 传给 imgUrl
+             *
+             * 封面图本身也要鉴权：加锁相册的封面地址虽然由后端返回了，
+             * 但去加载这张图时，图片端点同样要校验 token。
+             * 不传 albumKey 就拼不上 ?t=xxx，图片会 403，
+             * 最终显示成一片空白（看起来像「没有封面」）。
+             */
+            coverUrl: a.cover ? imgUrl(a.cover, a.key) : '',
             locked: Boolean(a.locked),
             /*
              * hasToken 只用于「显示锁图标」。
