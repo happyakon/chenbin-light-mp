@@ -126,6 +126,40 @@
   display: block;
 }
 
+/*
+ * 虚化封面
+ *
+ * 图片本身已经在后端 blur 过了（?tier=blur），
+ * 这里只做「压暗 + 降饱和」的处理，
+ * 让它在视觉上更沉，和旁边正常封面区分开。
+ *
+ * 注意：不能用 filter: blur()（小程序 WXSS 不支持），
+ * 所以真正的模糊全靠后端。
+ */
+.cover.is-blurred {
+  opacity: 0.72;
+}
+
+/*
+ * 「需要密码」小标签
+ *
+ * 放在右上角锁标记下方，用金色半透明底，
+ * 让人一眼知道这不是网络错误，是要密码。
+ */
+.need-pass {
+  position: absolute;
+  right: 12rpx;
+  bottom: 12rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(201, 168, 106, 0.42);
+  background: rgba(0, 0, 0, 0.55);
+  font-size: 18rpx;
+  letter-spacing: 0.06em;
+  color: rgba(201, 168, 106, 0.9);
+  z-index: 3;
+}
+
 /* ============================================================
    加锁相册的占位封面
    

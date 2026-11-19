@@ -47,22 +47,16 @@
         <view class="cover-wrap">
           <image
             wx:if="{{item.coverUrl}}"
-            class="cover"
+            class="cover {{item.coverBlurred ? 'is-blurred' : ''}}"
             src="{{item.coverUrl}}"
             mode="aspectFill"
             lazy-load
           />
+          <!--
+            既没封面又在加锁状态 → 用纯色占位兜底
+            （正常情况下后端会给 blur 档，走不到这里）
+          -->
           <view wx:else class="cover cover-empty">
-            <!--
-              加锁相册的占位封面。
-
-              不显示真实封面（后端在未解锁时不返回），
-              这里做一块有质感的「锁屏」：
-                · 斜向渐变底
-                · 细网格纹理
-                · 中心光晕 + 圆环 + 锁
-              和相册解锁页保持同一套视觉语言。
-            -->
             <view class="empty-glow"></view>
             <view class="empty-grid"></view>
             <view class="lock-badge">
@@ -71,8 +65,18 @@
             </view>
             <view class="empty-caption">加密相册</view>
           </view>
+
           <view class="cover-shade"></view>
+
+          <!-- 右上角锁标记 -->
           <view wx:if="{{item.locked}}" class="badge">🔒</view>
+
+          <!--
+            未解锁时在底部压一条「需要密码」，
+            提示这张卡不是坏了，是要密码。
+          -->
+          <view wx:if="{{item.coverBlurred}}" class="need-pass">需要密码</view>
+
           <view class="cover-text">
             <view class="cn">{{item.title}}</view>
             <view wx:if="{{item.en}}" class="en">{{item.en}}</view>
