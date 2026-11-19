@@ -61,7 +61,7 @@
             <view class="empty-grid"></view>
             <view class="lock-badge">
               <view class="lock-ring"></view>
-              <view class="lock-icon">🔒</view>
+              <image class="lock-svg" src="{{lockIcon}}" mode="aspectFit" />
             </view>
             <view class="empty-caption">加密相册</view>
           </view>
@@ -79,6 +79,15 @@
           <view wx:if="{{item.coverBlurred}}" class="lock-overlay">
             <image class="lock-overlay-svg" src="{{lockIcon}}" mode="aspectFit" />
             <view class="lock-overlay-text">Private Gallery</view>
+          </view>
+
+          <!--
+            右上角小锁徽章
+            和中间的线框锁用同一套图标（也是 SVG，不是 emoji），
+            保证视觉统一。
+          -->
+          <view wx:if="{{item.locked}}" class="badge">
+            <image class="badge-lock" src="{{lockIcon}}" mode="aspectFit" />
           </view>
 
           <!--

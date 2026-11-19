@@ -312,12 +312,17 @@
   box-sizing: border-box;
 }
 
-.lock-icon {
+/*
+ * 兜底占位里的锁（无封面 + 加锁时才会显示）
+ *
+ * 用 SVG 而不是 emoji，和卡片其它锁标记风格一致。
+ * 尺寸比中间叠加层的稍大：这里没有封面背景干扰，可以显眼一点。
+ */
+.lock-svg {
   position: relative;
-  font-size: 44rpx;
-  line-height: 1;
-  /* 暖色投影，让锁浮在光环上 */
-  text-shadow: 0 3rpx 12rpx rgba(201, 168, 106, 0.4);
+  width: 52rpx;
+  height: 60rpx;
+  display: block;
 }
 
 .empty-caption {
@@ -396,6 +401,18 @@
   justify-content: center;
   font-size: 22rpx;
   z-index: 3;
+}
+
+/*
+ * 徽章里的锁
+ *
+ * 48rpx 的圆里放 22rpx 的锁，四周留 13rpx 边距。
+ * 用 SAME 的 SVG 图标（不是 emoji），和中间的大锁风格统一。
+ */
+.badge-lock {
+  width: 22rpx;
+  height: 26rpx;
+  display: block;
 }
 
 .count {
