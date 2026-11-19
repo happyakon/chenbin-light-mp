@@ -1,12 +1,15 @@
 <view class="profile-page">
   <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
 
+  <!--
+    导航栏只放返回键和标题。
+    右上角是微信系统画的胶囊按钮（··· ●），页面盖不住它，
+    所以「保存」不放在这里，而是放到页面底部，
+    既不会重叠，也更符合「填完点保存」的操作习惯。
+  -->
   <view class="nav">
     <view class="back" bindtap="goBack">‹</view>
     <view class="nav-title">完善资料</view>
-    <view class="nav-save {{saving ? 'is-disabled' : ''}}" bindtap="onSave">
-      {{saving ? '保存中' : '保存'}}
-    </view>
   </view>
 
   <view class="content">
@@ -50,6 +53,13 @@
     <view class="tip">
       昵称和头像会显示在排行榜、点赞列表里。
       不填的话显示「{{defaultName}}」。
+    </view>
+  </view>
+
+  <!-- ============ 保存按钮（固定在底部）============ -->
+  <view class="footer">
+    <view class="save-btn {{saving ? 'is-disabled' : ''}}" bindtap="onSave">
+      {{saving ? '保存中…' : '保存'}}
     </view>
   </view>
 </view>

@@ -49,6 +49,15 @@ Page({
             collectionTitle: col.title,
             coverUrl: a.cover ? imgUrl(a.cover) : '',
             locked: Boolean(a.locked),
+            /*
+             * hasToken 只用于「显示锁图标」。
+             *
+             * ★ 不能拿它判断要不要进解锁页
+             *   因为它是在 loadAlbums 时算的静态值，
+             *   用户解锁后返回本页，onLoad 不会重新执行，
+             *   这个值就一直是 false，导致每次点都要重新输密码。
+             *   实际判断在 onAlbumTap 里实时读 storage。
+             */
             hasToken: Boolean(getAlbumToken(a.key)),
           });
         }
@@ -102,16 +111,58 @@ Page({
       `/pages/album/album?c=${encodeURIComponent(album.collectionKey)}` +
       `&a=${encodeURIComponent(album.key)}`;
 
-    if (album.locked && !album.hasToken) {
+    /*
+     * 加密相册：实时判断有没有 token。
+     *
+     * ★ 为什么不看 album.hasToken
+     *   那是 loadAlbums 时的静态快照。
+     *   用户解锁后返回，onLoad 不会再跑，快照仍是 false，
+     *   结果就是「解锁过了还要再输一遍」。
+     *
+     *   每次点击都从 storage 现读，才反映最新状态。
+     */
+    const token = getAlbumToken(album.key);
+    if (album.locked && !token) {
       wx.navigateTo({
         url:
           `/pages/unlock/unlock?c=${encodeURIComponent(album.collectionKey)}` +
-          `&a=${encodeURIComponent(album.key)}`,
+          `&a=${encodeURIComponent(album.key)}` +
+          `&title=${encodeURIComponent(album.title || '')}`,
       });
       return;
     }
 
     wx.navigateTo({ url });
+  },
+
+  /**
+   * 每次显示本页都刷新 hasToken
+   *
+   * 从解锁页返回、从相册页返回时都会触发，
+   * 保证锁图标的状态是最新的。
+   */
+  onShow() {
+    this.refreshTokenFlags();
+  },
+
+  /** 重新算每个相册的 hasToken */
+  refreshTokenFlags() {
+    const all = this.data.allAlbums || [];
+    if (!all.length) return;
+
+    let changed = false;
+    const next = all.map((a) => {
+      if (!a.locked) return a;
+      const has = Boolean(getAlbumToken(a.key));
+      if (has === a.hasToken) return a;
+      changed = true;
+      return { ...a, hasToken: has };
+    });
+
+    if (!changed) return;
+
+    this.setData({ allAlbums: next });
+    this.applyFilter(this.data.activeCollection, false);
   },
 
   onShareAppMessage() {
