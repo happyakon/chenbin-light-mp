@@ -8,7 +8,6 @@
  */
 import { post } from '../../utils/request.js';
 import { setAlbumToken } from '../../utils/image.js';
-import { LOCK_ICON_LARGE } from '../../utils/lock-icon.js';
 import { BASE_URL, IS_DEBUG } from '../../config/index.js';
 
 Page({
@@ -26,8 +25,6 @@ Page({
     statusBarHeight: 20,
     /** 抖动动画 */
     shake: false,
-    /** 金色线框锁图标（base64 SVG，见文件顶部常量） */
-    lockIcon: LOCK_ICON_LARGE,
   },
 
   onLoad(query) {

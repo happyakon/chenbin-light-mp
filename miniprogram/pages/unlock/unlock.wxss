@@ -47,38 +47,13 @@
 }
 
 /* ============================================================
-   锁标记：金色线框锁 + PRIVATE GALLERY
-   
-   整个块（图标 + 文字）作为一组居中。
+   锁图标
    ============================================================ */
 
-.lock-mark {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 56rpx;
-}
-
-.lock-svg {
-  width: 96rpx;
-  height: 112rpx;
-  display: block;
-}
-
-/*
- * PRIVATE GALLERY
- *
- * 全大写 + 大字号间距 + 金色，
- * 和图标形成「图标在上、标签在下」的竖排关系。
- */
-.lock-en {
-  margin-top: 26rpx;
-  font-size: 20rpx;
-  letter-spacing: 0.42em;
-  /* 字距会把最后一段空白也算进去，用 text-indent 补回来，视觉才真正居中 */
-  text-indent: 0.42em;
-  color: rgba(201, 168, 106, 0.85);
-  text-transform: uppercase;
+.lock-icon {
+  font-size: 76rpx;
+  margin-bottom: 40rpx;
+  opacity: 0.85;
 }
 
 /* ============================================================

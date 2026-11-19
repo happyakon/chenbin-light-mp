@@ -6,19 +6,8 @@
   </view>
 
   <view class="content">
-    <!--
-      锁图标 + PRIVATE GALLERY
-      
-      用 SVG（base64）而不是 emoji：
-        🔒 是彩色实心 emoji，改不了线条风格，在大面积暗底上显廉价。
-        用户要的是「金色线框锁」，只能自己画。
-      
-      小程序 WXML 不支持内联 <svg>，所以转成 base64 塞进 <image>。
-    -->
-    <view class="lock-mark">
-      <image class="lock-svg" src="{{lockIcon}}" mode="aspectFit" />
-      <view class="lock-en">PRIVATE GALLERY</view>
-    </view>
+    <!-- 锁图标：恢复成 emoji -->
+    <view class="lock-icon">🔒</view>
 
     <view class="album-title">{{albumTitle || '该相册'}}</view>
     <view class="hint">请输入密码后查看</view>
