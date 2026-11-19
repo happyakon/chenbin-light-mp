@@ -43,7 +43,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 88rpx 140rpx;
+  /*
+   * 底部留白比顶部多，视觉重心会上移。
+   * 原来 140rpx 压得太低，输入框和按钮位置偏下，
+   * 现在改成 220rpx，整块内容往上提一截。
+   */
+  padding: 0 88rpx 220rpx;
 }
 
 /* ============================================================
@@ -87,7 +92,7 @@
 
 .input {
   width: 100%;
-  height: 104rpx;
+  height: 100rpx;
   border: 1rpx solid rgba(240, 239, 236, 0.14);
   border-radius: 16rpx;
   background: rgba(255, 255, 255, 0.02);
@@ -123,10 +128,27 @@
    微信 <button> 自带 margin:auto 和 padding，必须重置。
    ============================================================ */
 
+/*
+ * 提交按钮
+ *
+ * ★ 微信 <button> 有一堆默认样式必须清掉，否则和输入框对不齐：
+ *     display: block  → 默认宽度不是 100%
+ *     margin: auto    → 左右自动边距，视觉上偏移
+ *     padding: 14px   → 加上 width:100% 会溢出
+ *     min-width       → 有最小值，窄屏下比输入框宽
+ *
+ * 所以这里显式重设：宽度高度和输入框完全一致（104rpx），
+ * padding 归零，margin 只留上边距。
+ */
 .submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  /* 和 .input 保持一致，都是 100rpx */
   height: 100rpx;
-  margin: 32rpx 0 0 0;
+  /* 只留上边距，左右必须为 0，否则会和输入框错位 */
+  margin: 28rpx 0 0 0;
   padding: 0;
   border-radius: 16rpx;
   border: 1rpx solid #c9a86a;
@@ -135,7 +157,8 @@
   font-size: 30rpx;
   letter-spacing: 0.3em;
   text-indent: 0.3em;
-  line-height: 98rpx;
+  /* 用 flex 居中，不需要 line-height 撑高度 */
+  line-height: normal;
   box-sizing: border-box;
   min-width: 0;
   overflow: visible;
