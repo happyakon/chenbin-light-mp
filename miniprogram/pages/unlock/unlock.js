@@ -10,6 +10,35 @@ import { post } from '../../utils/request.js';
 import { setAlbumToken } from '../../utils/image.js';
 import { BASE_URL, IS_DEBUG } from '../../config/index.js';
 
+/**
+ * 金色线框锁图标（SVG 转 base64）
+ *
+ * 为什么不用 emoji 🔒：
+ *   它是彩色实心图形，没法控制线条粗细和颜色，
+ *   放在大面积暗底上偏廉价。用户要的是线框风格。
+ *
+ * 为什么用 base64 而不是内联 svg：
+ *   小程序 WXML 不支持 <svg> 标签，只能走 image。
+ *
+ * 为什么硬编码而不是运行时转换：
+ *   小程序里 btoa / Buffer 都不可靠，
+ *   这串 base64 是构建时算好的，直接写死最稳。
+ *
+ * 原始 SVG（48×56，金色 #c9a86a，1.6px 线宽）：
+ *   <rect x=4 y=24 w=40 h=28 rx=4/>
+ *   <path d="M13 24V14a11 11 0 0 1 22 0v10"/>
+ *   <circle cx=24 cy=37 r=3/>
+ *   <path d="M24 40v5"/>
+ */
+const LOCK_ICON =
+  'data:image/svg+xml;base64,' +
+  'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA1NiIg' +
+  'ZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYzlhODZhIiBzdHJva2Utd2lkdGg9IjEuNiIgc3Ryb2tlLWxpbmVj' +
+  'YXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICA8cmVjdCB4PSI0IiB5PSIyNCIgd2lk' +
+  'dGg9IjQwIiBoZWlnaHQ9IjI4IiByeD0iNCIvPgogIDxwYXRoIGQ9Ik0xMyAyNFYxNGExMSAxMSAwIDAg' +
+  'MSAyMiAwdjEwIi8+CiAgPGNpcmNsZSBjeD0iMjQiIGN5PSIzNyIgcj0iMyIvPgogIDxwYXRoIGQ9Ik0y' +
+  'NCA0MHY1Ii8+Cjwvc3ZnPg==';
+
 Page({
   data: {
     collection: '',
@@ -25,6 +54,8 @@ Page({
     statusBarHeight: 20,
     /** 抖动动画 */
     shake: false,
+    /** 金色线框锁图标（base64 SVG，见文件顶部常量） */
+    lockIcon: LOCK_ICON,
   },
 
   onLoad(query) {

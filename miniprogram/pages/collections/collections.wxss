@@ -309,7 +309,15 @@
   margin-top: 6rpx;
   font-size: 17rpx;
   letter-spacing: 0.18em;
-  color: rgba(255, 255, 255, 0.55);
+  /*
+   * 和 PC 端保持一致用金色（--gold 是 #c9a86a）。
+   * 原来是 rgba(255,255,255,.55) 白色，
+   * 放在实拍封面和虚化封面上都显平淡。
+   *
+   * 透明度 0.85：太实会盖过上面的中文标题，
+   * 中文是主，英文是辅。
+   */
+  color: rgba(201, 168, 106, 0.85);
   text-transform: uppercase;
 }
 

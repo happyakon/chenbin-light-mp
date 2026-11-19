@@ -1,17 +1,4 @@
 <view class="unlock-page">
-  <!--
-    背景质感分四层（全部纯 CSS，不引图片）：
-      1. base-glow   径向金色光晕，偏上，模拟灯光打在墙上
-      2. base-grid   细网格纹理，给平面加一点织物感
-      3. band-top    顶部渐暗，压住状态栏区域
-      4. band-bottom 底部渐暗，聚焦视线到中间
-  -->
-  <view class="bg-layer bg-base"></view>
-  <view class="bg-layer bg-glow"></view>
-  <view class="bg-layer bg-grid"></view>
-  <view class="bg-layer bg-band-top"></view>
-  <view class="bg-layer bg-band-bottom"></view>
-
   <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
 
   <view class="nav">
@@ -20,20 +7,20 @@
 
   <view class="content">
     <!--
-      锁徽章：三层叠加
-        · 外层柔光（大范围金色晕）
-        · 中层细环（1rpx 冷金光圈）
-        · 图标本身带暖色投影
+      锁图标 + PRIVATE GALLERY
+      
+      用 SVG（base64）而不是 emoji：
+        🔒 是彩色实心 emoji，改不了线条风格，在大面积暗底上显廉价。
+        用户要的是「金色线框锁」，只能自己画。
+      
+      小程序 WXML 不支持内联 <svg>，所以转成 base64 塞进 <image>。
     -->
-    <view class="lock-badge">
-      <view class="lock-glow-outer"></view>
-      <view class="lock-glow-inner"></view>
-      <view class="lock-ring"></view>
-      <view class="lock-icon">🔒</view>
+    <view class="lock-mark">
+      <image class="lock-svg" src="{{lockIcon}}" mode="aspectFit" />
+      <view class="lock-en">PRIVATE GALLERY</view>
     </view>
 
     <view class="album-title">{{albumTitle || '该相册'}}</view>
-    <view class="title-rule"></view>
     <view class="hint">请输入密码后查看</view>
 
     <view class="input-wrap {{shake ? 'is-shake' : ''}}">
