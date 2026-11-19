@@ -53,7 +53,23 @@
             lazy-load
           />
           <view wx:else class="cover cover-empty">
-            <view class="lock-icon">🔒</view>
+            <!--
+              加锁相册的占位封面。
+
+              不显示真实封面（后端在未解锁时不返回），
+              这里做一块有质感的「锁屏」：
+                · 斜向渐变底
+                · 细网格纹理
+                · 中心光晕 + 圆环 + 锁
+              和相册解锁页保持同一套视觉语言。
+            -->
+            <view class="empty-glow"></view>
+            <view class="empty-grid"></view>
+            <view class="lock-badge">
+              <view class="lock-ring"></view>
+              <view class="lock-icon">🔒</view>
+            </view>
+            <view class="empty-caption">加密相册</view>
           </view>
           <view class="cover-shade"></view>
           <view wx:if="{{item.locked}}" class="badge">🔒</view>

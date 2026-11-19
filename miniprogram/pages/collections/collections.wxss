@@ -126,16 +126,117 @@
   display: block;
 }
 
+/* ============================================================
+   加锁相册的占位封面
+   
+   未解锁时不显示真实封面（后端故意不返回），
+   所以这里要做一块「看起来是有意设计」的锁屏，
+   而不是一块纯黑 + 一个 emoji。
+   
+   和相册解锁页用同一套视觉语言：暗底 + 金色光晕 + 细网格。
+   ============================================================ */
+
 .cover-empty {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /*
+   * 斜向渐变。
+   *
+   * 亮度比之前提高了一档（#1c1c22 → #141418）：
+   * 卡片在网格里要和旁边有实拍封面的相册并列，
+   * 太黑会让整列看起来「缺了一块」。
+   */
+  background: linear-gradient(158deg, #1c1c22 0%, #141418 48%, #0e0e11 100%);
+  overflow: hidden;
+}
+
+/* 中心金色光晕 */
+.empty-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 280rpx;
+  height: 280rpx;
+  margin-left: -140rpx;
+  margin-top: -140rpx;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(201, 168, 106, 0.15) 0%,
+    rgba(201, 168, 106, 0.06) 34%,
+    rgba(201, 168, 106, 0.016) 56%,
+    rgba(201, 168, 106, 0) 74%
+  );
+}
+
+/* 细网格纹理，和展开页呼应 */
+.empty-grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  /*
+   * 卡片只有 165px 宽，网格太密会显得乱。
+   * 间距 56rpx（约 28px），透明度 0.025 ——
+   * 比解锁页（整屏）更淡，因为这里的观看距离更近。
+   */
+  background-image: linear-gradient(
+      to right,
+      rgba(240, 239, 236, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(240, 239, 236, 0.025) 1px,
+      transparent 1px
+    );
+  background-size: 56rpx 56rpx;
+  background-position: center top;
+}
+
+/* 锁：圆环 + 图标 */
+.lock-badge {
+  position: relative;
+  width: 96rpx;
+  height: 96rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #141414;
+}
+
+.lock-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 96rpx;
+  height: 96rpx;
+  margin-left: -48rpx;
+  margin-top: -48rpx;
+  border-radius: 50%;
+  border: 1rpx solid rgba(201, 168, 106, 0.3);
+  background: rgba(201, 168, 106, 0.03);
+  box-sizing: border-box;
 }
 
 .lock-icon {
-  font-size: 56rpx;
-  opacity: 0.5;
+  position: relative;
+  font-size: 44rpx;
+  line-height: 1;
+  /* 暖色投影，让锁浮在光环上 */
+  text-shadow: 0 3rpx 12rpx rgba(201, 168, 106, 0.4);
+}
+
+.empty-caption {
+  position: relative;
+  margin-top: 18rpx;
+  font-size: 20rpx;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  color: rgba(201, 168, 106, 0.5);
 }
 
 .cover-shade {
@@ -185,8 +286,13 @@
   width: 48rpx;
   height: 48rpx;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(10rpx);
+  background: rgba(0, 0, 0, 0.6);
+  /*
+   * 原来用 backdrop-filter: blur() 做毛玻璃，
+   * 但小程序 WXSS 不支持这个属性，等于没写。
+   * 改成稍高的不透明度 + 细边框，视觉上更明确。
+   */
+  border: 1rpx solid rgba(201, 168, 106, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
