@@ -161,6 +161,62 @@
 }
 
 /* ============================================================
+   虚化封面中间的「锁 + PRIVATE GALLERY」
+   
+   占据卡片宽度的一半，水平垂直居中。
+   为什么用 50% 宽：
+     太小看不清是什么，太大又盖住封面本身。
+     一半宽刚好能放下「线框锁 + 一行英文」，同时保留封面辨识度。
+   ============================================================ */
+
+.lock-overlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  /* 不拦截点击，整张卡片都是点击区域 */
+  pointer-events: none;
+}
+
+/*
+ * 锁图标
+ *
+ * 用固定 rpx 而不是百分比：
+ *   <image> 用百分比高度时在部分机型上会被压成 0，
+ *   rpx 按屏宽换算，各机型比例一致。
+ *
+ * 48×56 rpx 是 viewBox 24×28 的两倍，等比不变形。
+ */
+.lock-overlay-svg {
+  width: 48rpx;
+  height: 56rpx;
+  display: block;
+}
+
+/*
+ * PRIVATE GALLERY
+ *
+ * 字号用 rpx 固定值而不是百分比：
+ * 百分比字号在小程序里表现不稳定。
+ * 卡片实际宽度约 330rpx，17rpx 的字母刚好一行放得下。
+ */
+.lock-overlay-text {
+  margin-top: 14rpx;
+  font-size: 17rpx;
+  letter-spacing: 0.2em;
+  /* 字距会在末尾多算一段空白，用 text-indent 补回来才真正居中 */
+  text-indent: 0.2em;
+  color: rgba(201, 168, 106, 0.9);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* ============================================================
    加锁相册的占位封面
    
    未解锁时不显示真实封面（后端故意不返回），

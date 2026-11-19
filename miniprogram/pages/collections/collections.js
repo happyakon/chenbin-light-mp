@@ -6,6 +6,7 @@
  */
 import { get } from '../../utils/request.js';
 import { imgUrl, getAlbumToken } from '../../utils/image.js';
+import { LOCK_ICON_SMALL } from '../../utils/lock-icon.js';
 import { COLLECTION_TABS, IS_DEBUG } from '../../config/index.js';
 
 Page({
@@ -20,6 +21,8 @@ Page({
     albums: [],
     loading: true,
     statusBarHeight: 20,
+    /** 卡片中间叠加的金色线框锁（base64 SVG） */
+    lockIcon: LOCK_ICON_SMALL,
   },
 
   onLoad() {

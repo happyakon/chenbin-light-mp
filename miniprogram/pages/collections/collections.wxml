@@ -68,8 +68,18 @@
 
           <view class="cover-shade"></view>
 
-          <!-- 右上角锁标记 -->
-          <view wx:if="{{item.locked}}" class="badge">🔒</view>
+          <!--
+            虚化封面中间叠「线框锁 + PRIVATE GALLERY」。
+            宽度占卡片的一半，居中。
+
+            为什么不用角上的小圆徽章：
+              小锁看不清是什么，信息量低；
+              中间大一点的标记能让用户一眼明白「这是加密相册」。
+          -->
+          <view wx:if="{{item.coverBlurred}}" class="lock-overlay">
+            <image class="lock-overlay-svg" src="{{lockIcon}}" mode="aspectFit" />
+            <view class="lock-overlay-text">Private Gallery</view>
+          </view>
 
           <!--
             未解锁时在底部压一条「需要密码」，
