@@ -38,7 +38,21 @@ Page({
   async loadAlbums() {
     this.setData({ loading: true });
     try {
-      const data = await get('/api/collections', { auth: false });
+      /*
+       * ★ 带上已解锁相册的凭证
+       *
+       * 为什么：加锁相册在没凭证时，后端不会返回真实封面
+       * （设计如此，避免未解锁的人看到封面）。
+       * 小程序没有 Cookie，靠这个请求头告诉后端「我已经解锁过了」。
+       *
+       * 头格式：X-Album-Token: <相册key>:<token>
+       * 多个相册用逗号分隔。
+       */
+      const headers = {};
+      const tokens = this.collectAlbumTokens();
+      if (tokens) headers['X-Album-Token'] = tokens;
+
+      const data = await get('/api/collections', { auth: false, headers });
       const all = [];
 
       for (const col of data.collections || []) {
@@ -65,6 +79,9 @@ Page({
 
       this.setData({ allAlbums: all, loading: false });
       this.applyFilter(this.data.activeCollection, false);
+
+      /* 记下当前 token 指纹，onShow 时用来判断有没有新的解锁 */
+      this._lastTokenSig = this.tokenSignature();
     } catch (err) {
       if (IS_DEBUG) console.warn('[collections] 加载失败', err);
       this.setData({ loading: false });
@@ -136,13 +153,59 @@ Page({
   },
 
   /**
-   * 每次显示本页都刷新 hasToken
+   * 收集本机所有已解锁相册的凭证，拼成请求头
    *
-   * 从解锁页返回、从相册页返回时都会触发，
-   * 保证锁图标的状态是最新的。
+   * 格式：key1:token1,key2:token2
+   * 没有已解锁的相册就返回空字符串。
+   *
+   * 为什么一次带上全部：
+   *   /api/collections 一次返回所有相册，
+   *   头里得覆盖到每一个已解锁的，否则那些相册的封面还是空的。
+   */
+  collectAlbumTokens() {
+    const all = this.data.allAlbums || [];
+    const parts = [];
+
+    for (const a of all) {
+      if (!a.locked) continue;
+      const t = getAlbumToken(a.key);
+      if (t) parts.push(a.key + ':' + t);
+    }
+
+    return parts.join(',');
+  },
+
+  /**
+   * 每次显示本页都刷新
+   *
+   * 从解锁页 / 相册页返回时触发。
+   *
+   * ★ 为什么要重新拉一次列表
+   *   解锁后封面才会返回，不重新请求的话
+   *   卡片上一直是锁图标占位，看不到封面。
    */
   onShow() {
+    /*
+     * 首次进入时 allAlbums 为空，onLoad 里的 loadAlbums 会处理，
+     * 这里不重复请求。
+     */
+    if (!this.data.allAlbums.length) return;
+
+    /*
+     * 已有数据 → 说明是从别的页面返回的。
+     * 有 token 变化（刚解锁）就重新拉，
+     * 没变化就只更新锁图标，省一次请求。
+     */
     this.refreshTokenFlags();
+
+    if (this.tokenSignature() !== this._lastTokenSig) {
+      this.loadAlbums();
+    }
+  },
+
+  /** token 状态指纹：用来判断「有没有新的解锁」 */
+  tokenSignature() {
+    return this.collectAlbumTokens();
   },
 
   /** 重新算每个相册的 hasToken */

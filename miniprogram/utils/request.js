@@ -31,6 +31,7 @@ export function request(options) {
     auth = true,
     silent = false,
     retry = false,
+    headers: extraHeaders,
   } = options;
 
   return new Promise((resolve, reject) => {
@@ -39,6 +40,20 @@ export function request(options) {
     if (auth) {
       const token = getToken();
       if (token) header.Authorization = 'Bearer ' + token;
+    }
+
+    /*
+     * 允许调用方传额外的请求头。
+     *
+     * 主要用途：加密相册的凭证（X-Album-Token）。
+     * 小程序没有 Cookie，只能靠请求头或 URL 参数带凭证；
+     * 请求头比 URL 参数干净（不会进访问日志），优先用这个。
+     */
+    if (extraHeaders && typeof extraHeaders === 'object') {
+      Object.keys(extraHeaders).forEach((k) => {
+        const v = extraHeaders[k];
+        if (v != null && v !== '') header[k] = v;
+      });
     }
 
     wx.request({

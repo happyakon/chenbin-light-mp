@@ -78,7 +78,41 @@ Page({
       sizeType: ['compressed'],
       success: (res) => {
         const file = res.tempFiles && res.tempFiles[0];
-        if (file) this.uploadAvatar(file.tempFilePath);
+        if (!file) return;
+
+        /*
+         * 选完图后先裁剪成正方形。
+         *
+         * 用 wx.cropImage（基础库 2.26.0+），cropScale 设为 1:1
+         * 就是方形裁剪框，用户可拖动/缩放，确认后才上传。
+         *
+         * 为什么不直接上传让后端裁：
+         *   后端只能硬裁中心区域，用户想保留的部分可能被切掉。
+         *   让用户在裁剪界面自己选，体验好得多。
+         *
+         * 兼容性：低版本基础库没有 cropImage，降级为直接上传
+         * （后端仍会裁成 200×200 正方形）。
+         */
+        if (typeof wx.cropImage === 'function') {
+          wx.cropImage({
+            src: file.tempFilePath,
+            cropScale: '1:1',
+            success: (cropRes) => {
+              this.uploadAvatar(cropRes.tempFilePath);
+            },
+            fail: (err) => {
+              /*
+               * 用户点了取消（errMsg 含 cancel）就什么都不做；
+               * 其他错误（如基础库不支持）降级为原图上传。
+               */
+              const msg = String((err && err.errMsg) || '');
+              if (msg.indexOf('cancel') !== -1) return;
+              this.uploadAvatar(file.tempFilePath);
+            },
+          });
+        } else {
+          this.uploadAvatar(file.tempFilePath);
+        }
       },
       fail: () => {
         /* 用户取消，不提示 */
