@@ -86,14 +86,34 @@ Page({
     this.setData({ submitting: true, error: '' });
 
     try {
-      const res = await post(
-        `/api/albums/${encodeURIComponent(this.data.album)}/unlock`,
-        { password },
-        { silent: true }
-      );
+      /*
+       * ★ 必须调小程序自己的接口，不能调 Web 端的。
+       *
+       * /api/albums/:key/unlock 是 Web 端接口：
+       *   验证通过后种 Cookie，返回 { ok, locked, expiresIn }
+       *   没有 token 字段 —— 小程序拿不到 Cookie，也就无法取图。
+       *
+       * /api/mp/albums/unlock 是给小程序用的：
+       *   返回 { ok, locked, token, expiresIn }
+       *   小程序把 token 存起来，拼在图片 URL 的 ?t= 参数上。
+       */
+      const res = await post('/api/mp/albums/unlock', {
+        album: this.data.album,
+        password,
+      });
 
-      if (res.albumToken) {
-        setAlbumToken(this.data.album, res.albumToken);
+      if (res.token) {
+        setAlbumToken(this.data.album, res.token);
+      } else {
+        /*
+         * 没拿到 token 说明后端返回异常。
+         * 这种情况不要静默跳转，否则用户进去看到「还没有照片」会更困惑。
+         */
+        this.setData({
+          submitting: false,
+          error: '解锁异常，请重试',
+        });
+        return;
       }
 
       // 成功 → 进相册

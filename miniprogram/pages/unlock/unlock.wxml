@@ -6,7 +6,17 @@
   </view>
 
   <view class="content">
-    <view class="lock-icon">🔒</view>
+    <!--
+      锁图标区域加质感：
+        · 外圈柔光（金色，低透明度）
+        · 中间圆形底（微渐变 + 内阴影）
+        · 锁图标本身带一点投影
+    -->
+    <view class="lock-badge">
+      <view class="lock-glow"></view>
+      <view class="lock-ring"></view>
+      <view class="lock-icon">🔒</view>
+    </view>
 
     <view class="album-title">{{albumTitle || '该相册'}}</view>
     <view class="hint">请输入密码后查看</view>

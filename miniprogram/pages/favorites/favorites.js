@@ -4,7 +4,7 @@
  * 3 列瀑布流展示，和相册页的照片墙保持一致的视觉。
  */
 import { get } from '../../utils/request.js';
-import { imgUrl } from '../../utils/image.js';
+import { imgUrl, setPendingList } from '../../utils/image.js';
 import { IS_DEBUG } from '../../config/index.js';
 
 Page({
@@ -80,11 +80,33 @@ Page({
     const photo = e.currentTarget.dataset.photo;
     if (!photo) return;
 
+    /*
+     * ★ 只浏览收藏的这几张，不是整个相册
+     *
+     * 用户期望：在收藏里点开一张，左右滑动应该在收藏之间切，
+     *          而不是跑到那张照片所在的整个相册里。
+     *
+     * 实现：
+     *   把「当前收藏的全部 path」和「点的是哪一张」存进 storage，
+     *   相册页读到就用这个限定列表，而不是去拉整个相册。
+     *
+     * 为什么用 storage 而不是 URL 参数：
+     *   收藏可能有几十上百张，拼进 URL 会超长。
+     */
+    const all = this.data.photos || [];
+    const paths = all.map((p) => p.path);
+
+    setPendingList({
+      paths,
+      focus: photo.path,
+      title: '我的收藏',
+    });
+
     wx.navigateTo({
       url:
         `/pages/album/album?c=${encodeURIComponent(photo.collection)}` +
         `&a=${encodeURIComponent(photo.album)}` +
-        `&focus=${encodeURIComponent(photo.file)}`,
+        `&list=1`,
     });
   },
 

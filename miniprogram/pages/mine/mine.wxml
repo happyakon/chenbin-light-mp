@@ -5,6 +5,34 @@
     <view class="page-title">我的</view>
   </view>
 
+  <!-- ============ 资料卡片 ============ -->
+  <view class="profile-card" bindtap="goEditProfile">
+    <view class="avatar-wrap">
+      <!--
+        有头像显示图片，没有显示首字母占位
+        用 mode="aspectFill" 保证不拉伸
+      -->
+      <image
+        wx:if="{{avatar}}"
+        class="avatar"
+        src="{{avatarFull}}"
+        mode="aspectFill"
+        binderror="onAvatarError"
+      />
+      <view wx:else class="avatar avatar-ph">
+        <text class="avatar-initial">{{initial}}</text>
+      </view>
+    </view>
+
+    <view class="profile-body">
+      <view class="profile-name">{{nickname || defaultName}}</view>
+      <view class="profile-hint">{{nickname ? '点这里修改资料' : '完善头像和昵称'}}</view>
+    </view>
+
+    <view class="profile-arrow">›</view>
+  </view>
+
+  <!-- ============ 功能列表 ============ -->
   <view class="list">
     <view class="row" bindtap="goFavorites">
       <text class="row-icon">☆</text>

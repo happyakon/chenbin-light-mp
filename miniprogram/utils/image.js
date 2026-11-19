@@ -51,6 +51,51 @@ export function clearAlbumToken(albumKey) {
   } catch (_) {}
 }
 
+/* ------------------------------------------------------------ 限定列表 */
+
+/**
+ * 「只看这几张」的临时列表
+ *
+ * 用途：从收藏 / 点赞页点开某张图时，左右滑动应该只在
+ *       收藏的那些图之间切换，而不是整个相册。
+ *
+ * 为什么用 storage 传而不是 URL 参数：
+ *   收藏可能有几十上百张，路径拼进 URL 会超长
+ *   （小程序 URL 长度有限制，且编码后更长）。
+ *
+ * 为什么只存一次：
+ *   读一次就删。避免下次正常进相册时误用上次的列表。
+ */
+const PENDING_LIST_KEY = 'pending_photo_list';
+
+/**
+ * 存一个待浏览的列表
+ * @param {object} opts
+ * @param {string[]} opts.paths   照片 path 列表（按显示顺序）
+ * @param {string} opts.focus     打开时定位到哪一张
+ * @param {string} opts.title     页面标题（如「我的收藏」）
+ */
+export function setPendingList({ paths, focus, title }) {
+  try {
+    wx.setStorageSync(PENDING_LIST_KEY, { paths, focus, title });
+  } catch (_) {}
+}
+
+/**
+ * 取出并清空待浏览列表
+ * @returns {{paths:string[], focus:string, title:string}|null}
+ */
+export function takePendingList() {
+  try {
+    const v = wx.getStorageSync(PENDING_LIST_KEY);
+    wx.removeStorageSync(PENDING_LIST_KEY);
+    if (!v || !Array.isArray(v.paths) || !v.paths.length) return null;
+    return v;
+  } catch (_) {
+    return null;
+  }
+}
+
 /**
  * 给照片对象的三个 URL 字段批量拼域名
  * @param {object} photo 后端返回的照片对象

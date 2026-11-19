@@ -7,7 +7,8 @@
     "pages/album/album",
     "pages/unlock/unlock",
     "pages/favorites/favorites",
-    "pages/likes/likes"
+    "pages/likes/likes",
+    "pages/profile/profile"
   ],
   "window": {
     "backgroundColor": "#0d0d0d",

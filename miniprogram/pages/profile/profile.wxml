@@ -1,0 +1,55 @@
+<view class="profile-page">
+  <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
+
+  <view class="nav">
+    <view class="back" bindtap="goBack">‹</view>
+    <view class="nav-title">完善资料</view>
+    <view class="nav-save {{saving ? 'is-disabled' : ''}}" bindtap="onSave">
+      {{saving ? '保存中' : '保存'}}
+    </view>
+  </view>
+
+  <view class="content">
+    <!-- ============ 头像 ============ -->
+    <view class="avatar-section" bindtap="chooseAvatar">
+      <view class="avatar-wrap">
+        <image
+          wx:if="{{avatarFull}}"
+          class="avatar"
+          src="{{avatarFull}}"
+          mode="aspectFill"
+          binderror="onAvatarError"
+        />
+        <view wx:else class="avatar avatar-ph">
+          <text class="avatar-initial">{{initial}}</text>
+        </view>
+
+        <!-- 相机小角标，提示可点击 -->
+        <view class="avatar-badge">📷</view>
+      </view>
+
+      <view class="avatar-hint">{{uploading ? '上传中…' : '点击更换头像'}}</view>
+    </view>
+
+    <!-- ============ 昵称 ============ -->
+    <view class="field">
+      <view class="field-label">昵称</view>
+      <input
+        class="field-input"
+        type="nickname"
+        value="{{nickname}}"
+        placeholder="{{defaultName}}"
+        placeholder-class="ph"
+        maxlength="20"
+        bindinput="onNicknameInput"
+        bindblur="onNicknameBlur"
+      />
+      <view class="field-count">{{nickname.length}}/20</view>
+    </view>
+
+    <view class="tip">
+      昵称和头像会显示在排行榜、点赞列表里。
+      不填的话显示「{{defaultName}}」。
+    </view>
+  </view>
+</view>

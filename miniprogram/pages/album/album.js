@@ -13,7 +13,7 @@
  *   并且弹一个「上次看到第 N 张，继续看？」的提示。
  */
 import { get, post, del } from '../../utils/request.js';
-import { imgUrl } from '../../utils/image.js';
+import { imgUrl, getAlbumToken, takePendingList } from '../../utils/image.js';
 import { EXIF_FIELDS, IS_DEBUG } from '../../config/index.js';
 
 /** 面板吸附阈值（px） */
@@ -41,6 +41,14 @@ Page({
     col3: [],
     /** 相册封面（管理员设置的，没有则用第一张） */
     coverUrl: '',
+
+    /*
+     * 限定列表模式
+     *
+     * true = 从收藏/点赞进来的，只浏览指定的几张，
+     *        左右滑动不跨出这个列表，也不显示照片墙。
+     */
+    listMode: false,
 
     /* ---------------- 断点续看 ---------------- */
     /** 上次看到的索引（-1 = 没有记录） */
@@ -76,6 +84,8 @@ Page({
     const collection = decodeURIComponent(query.c || '');
     const album = decodeURIComponent(query.a || '');
     const focus = decodeURIComponent(query.focus || '');
+    /** list=1 表示「只看 storage 里那组照片」（从收藏/点赞进来的） */
+    const isList = query.list === '1';
 
     if (!collection || !album) {
       this.setData({ loading: false, error: '缺少参数' });
@@ -83,6 +93,25 @@ Page({
     }
 
     this.setData({ collection, album });
+
+    /*
+     * 限定列表模式（从收藏 / 点赞点进来）
+     *
+     * 用户期望：左右滑动只在收藏的那几张之间切，
+     *          而不是跑到整本相册。
+     *
+     * 做法：从 storage 取出 path 列表，只加载这些。
+     */
+    if (isList) {
+      const pending = takePendingList();
+      if (pending) {
+        this.setData({ albumTitle: pending.title || '' });
+        this.loadPhotosByPaths(pending.paths, pending.focus || focus);
+        return;
+      }
+      /* storage 里没有（可能被清了），降级成正常相册 */
+    }
+
     this.loadPhotos(focus);
   },
 
@@ -95,13 +124,139 @@ Page({
     this.saveProgress();
   },
 
+  /**
+   * 加载指定的照片（从收藏 / 点赞进来的限定列表模式）
+   *
+   * 和 loadPhotos 的区别：
+   *   loadPhotos        → 拉整个相册
+   *   loadPhotosByPaths → 只拉指定的这几张
+   *
+   * 实现思路：
+   *   收藏接口返回的 path 形如 "portrait/people/DSC_2100.jpg"，
+   *   按相册分组后逐组请求 /api/mp/albums/photos，
+   *   再从结果里挑出需要的那些。
+   *
+   *   为什么不能直接用收藏接口的数据：
+   *     收藏接口不带 EXIF、宽高比也不一定全，
+   *     全屏浏览要用到这些。所以还是从相册接口拿完整数据。
+   *
+   * @param {string[]} paths 要展示的照片 path（按顺序）
+   * @param {string} focus   打开时定位到哪一张
+   */
+  async loadPhotosByPaths(paths, focus) {
+    try {
+      /* 按「摄影集/相册」分组，减少请求次数 */
+      const groups = new Map();
+      for (const p of paths) {
+        const seg = String(p).split('/');
+        if (seg.length < 3) continue;
+        const key = seg[0] + '/' + seg[1];
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(p);
+      }
+
+      const collected = [];
+
+      for (const [key, want] of groups.entries()) {
+        const seg = key.split('/');
+        const collection = seg[0];
+        const album = seg[1];
+
+        /* 加密相册要带 token */
+        const albumToken = getAlbumToken(album);
+        const tokenQuery = albumToken
+          ? '&t=' + encodeURIComponent(albumToken)
+          : '';
+
+        let data;
+        try {
+          data = await get(
+            `/api/mp/albums/photos?c=${encodeURIComponent(collection)}` +
+              `&a=${encodeURIComponent(album)}${tokenQuery}`
+          );
+        } catch (_) {
+          /* 某个相册取失败（比如要密码），跳过这个相册的照片 */
+          continue;
+        }
+
+        const wantSet = new Set(want);
+        for (const p of data.photos || []) {
+          if (wantSet.has(p.path)) {
+            collected.push({
+              ...p,
+              collection,
+              album,
+            });
+          }
+        }
+      }
+
+      /* 按传入的顺序排（收藏是最近优先，要保留这个顺序） */
+      const order = new Map(paths.map((p, i) => [p, i]));
+      collected.sort((a, b) => (order.get(a.path) ?? 0) - (order.get(b.path) ?? 0));
+
+      if (!collected.length) {
+        this.setData({ loading: false, error: '照片加载失败' });
+        return;
+      }
+
+      const photos = collected.map((p, i) => ({
+        ...p,
+        index: i,
+        thumbUrl: imgUrl(p.thumb, p.album),
+        mediumUrl: imgUrl(p.medium, p.album),
+        originalUrl: imgUrl(p.original, p.album),
+      }));
+
+      const found = photos.findIndex((p) => p.path === focus);
+
+      this.setData({
+        photos,
+        loading: false,
+        mode: 'viewer',
+        current: found >= 0 ? found : 0,
+        /* 限定列表模式不显示照片墙、不记断点 */
+        listMode: true,
+      });
+
+      this.updateExif(found >= 0 ? found : 0);
+    } catch (err) {
+      if (IS_DEBUG) console.warn('[album] 限定列表加载失败', err);
+      this.setData({ loading: false, error: '照片加载失败' });
+    }
+  },
+
   /** 拉照片列表 */
   async loadPhotos(focusFile) {
     const { collection, album } = this.data;
     try {
+      /*
+       * 加密相册要在 URL 上带 token（?t=xxx）。
+       *
+       * 为什么用 URL 参数而不是请求头：
+       *   · <image> 组件加载图片时不会带自定义头，只能把 token 拼在 URL 上
+       *   · request.js 也只自动加 Authorization，不支持传自定义头
+       *   两处统一用 ?t= 参数，后端已经支持。
+       */
+      const albumToken = getAlbumToken(album);
+      const tokenQuery = albumToken
+        ? '&t=' + encodeURIComponent(albumToken)
+        : '';
+
       const data = await get(
-        `/api/mp/albums/photos?c=${encodeURIComponent(collection)}&a=${encodeURIComponent(album)}`
+        `/api/mp/albums/photos?c=${encodeURIComponent(collection)}&a=${encodeURIComponent(album)}${tokenQuery}`
       );
+
+      /*
+       * 后端返回 locked=true 且照片为空 → 还没解锁。
+       * 引导回解锁页，而不是显示「这个相册还没有照片」
+       * （那会让用户以为相册是空的）。
+       */
+      if (data.locked && !(data.photos || []).length) {
+        this.setData({ loading: false });
+        this.goUnlock();
+        return;
+      }
 
       const photos = (data.photos || []).map((p, i) => ({
         ...p,
@@ -155,11 +310,36 @@ Page({
       });
     } catch (err) {
       if (IS_DEBUG) console.warn('[album] 加载失败', err);
+
+      /* 403 说明需要密码，直接引导去解锁页 */
+      if (err.statusCode === 403) {
+        this.setData({ loading: false });
+        this.goUnlock();
+        return;
+      }
+
       this.setData({
         loading: false,
-        error: err.statusCode === 403 ? '该相册需要密码' : '相册加载失败',
+        error: '相册加载失败',
       });
     }
+  },
+
+  /**
+   * 跳到解锁页
+   *
+   * 用 redirectTo 而不是 navigateTo：
+   *   解锁成功后 unlock 页会 redirectTo 回相册，
+   *   用 navigateTo 会越堆越深（相册 → 解锁 → 相册 → 解锁…）。
+   */
+  goUnlock() {
+    const { collection, album, albumTitle } = this.data;
+    wx.redirectTo({
+      url:
+        `/pages/unlock/unlock?c=${encodeURIComponent(collection)}` +
+        `&a=${encodeURIComponent(album)}` +
+        `&title=${encodeURIComponent(albumTitle || '')}`,
+    });
   },
 
   /* ---------------------------------------------------------- 封面 */
@@ -234,6 +414,15 @@ Page({
 
   /** 保存当前进度 */
   saveProgress() {
+    /*
+     * 限定列表模式不记进度。
+     *
+     * 因为那时 photos 是「收藏的几张」，
+     * current 是它在收藏列表里的索引，
+     * 存下来会导致下次正常进相册时跳到错误位置。
+     */
+    if (this.data.listMode) return;
+
     if (this.data.mode !== 'viewer') return;
     if (!this.data.photos.length) return;
     try {
@@ -277,6 +466,18 @@ Page({
 
   /** 从全屏浏览返回照片墙 */
   backToGrid() {
+    /*
+     * 限定列表模式（从收藏 / 点赞进来）没有照片墙，
+     * 直接返回上一页（收藏页 / 点赞页）。
+     *
+     * 否则会把 mode 切成 grid，但 col1/col2/col3 都是空的，
+     * 用户看到一个空白页面。
+     */
+    if (this.data.listMode) {
+      this.goBackToPrev();
+      return;
+    }
+
     this.saveProgress();
     this.setData({ mode: 'grid', expanded: false, dragProgress: 0 });
   },
@@ -551,11 +752,16 @@ Page({
   /* ---------------------------------------------------------- 返回 */
 
   goBack() {
-    // 全屏浏览时，先回照片墙
+    // 全屏浏览时，先回照片墙（限定列表模式直接回上一页）
     if (this.data.mode === 'viewer') {
       this.backToGrid();
       return;
     }
+    this.goBackToPrev();
+  },
+
+  /** 返回上一页；没有上一页就回摄影集 */
+  goBackToPrev() {
     const pages = getCurrentPages();
     if (pages.length > 1) {
       wx.navigateBack();

@@ -35,3 +35,5 @@ miniprogram/project.config.json
 
 # 临时提交信息
 .commitmsg
+
+.cm

@@ -4,7 +4,7 @@
  * 3 列瀑布流，和收藏页结构完全一样，只差数据源。
  */
 import { get } from '../../utils/request.js';
-import { imgUrl } from '../../utils/image.js';
+import { imgUrl, setPendingList } from '../../utils/image.js';
 import { IS_DEBUG } from '../../config/index.js';
 
 Page({
@@ -77,11 +77,21 @@ Page({
     const photo = e.currentTarget.dataset.photo;
     if (!photo) return;
 
+    /* 只浏览点过赞的这几张，不是整个相册。理由见 favorites.js */
+    const all = this.data.photos || [];
+    const paths = all.map((p) => p.path);
+
+    setPendingList({
+      paths,
+      focus: photo.path,
+      title: '我的点赞',
+    });
+
     wx.navigateTo({
       url:
         `/pages/album/album?c=${encodeURIComponent(photo.collection)}` +
         `&a=${encodeURIComponent(photo.album)}` +
-        `&focus=${encodeURIComponent(photo.file)}`,
+        `&list=1`,
     });
   },
 

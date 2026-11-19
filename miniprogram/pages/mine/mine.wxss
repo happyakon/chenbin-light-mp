@@ -27,6 +27,81 @@
   color: #f0efec;
 }
 
+/* ============================================================
+   资料卡片
+   ============================================================ */
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 28rpx;
+  margin: 0 36rpx 44rpx;
+  padding: 32rpx;
+  border-radius: 20rpx;
+  border: 1rpx solid rgba(240, 239, 236, 0.08);
+  background: rgba(255, 255, 255, 0.018);
+}
+
+/* 头像是圆的，overflow hidden 保证不溢出圆角 */
+.avatar-wrap {
+  flex: 0 0 auto;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+}
+
+.avatar {
+  width: 112rpx;
+  height: 112rpx;
+  display: block;
+}
+
+/* 没头像时的占位：暗金圆形 + 首字母 */
+.avatar-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(201, 168, 106, 0.1);
+  border: 1rpx solid rgba(201, 168, 106, 0.28);
+}
+
+.avatar-initial {
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 44rpx;
+  color: #c9a86a;
+  line-height: 1;
+}
+
+.profile-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-name {
+  font-size: 32rpx;
+  letter-spacing: 0.04em;
+  color: #f0efec;
+  /* 昵称太长时省略 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-hint {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  letter-spacing: 0.03em;
+  color: #5a5956;
+}
+
+.profile-arrow {
+  flex: 0 0 auto;
+  font-size: 32rpx;
+  color: #5a5956;
+}
+
 .list {
   border-top: 1rpx solid rgba(240, 239, 236, 0.07);
 }
