@@ -45,10 +45,9 @@
   justify-content: center;
   /*
    * 底部留白比顶部多，视觉重心会上移。
-   * 原来 140rpx 压得太低，输入框和按钮位置偏下，
-   * 现在改成 220rpx，整块内容往上提一截。
    */
   padding: 0 88rpx 220rpx;
+  box-sizing: border-box;
 }
 
 /* ============================================================
@@ -86,7 +85,15 @@
    ============================================================ */
 
 .input-wrap {
-  width: 100%;
+  /*
+   * ★ 用 align-self: stretch 而不是 width: 100%
+   *
+   * .content 是 align-items: center 的 flex 容器。
+   * 在这种容器里，子元素的 width: 100% 表现不可靠
+   * （尤其 <button> 会被当成内容宽度）。
+   * stretch 是 flex 规范里「撑满交叉轴」的标准做法，最稳。
+   */
+  align-self: stretch;
   margin-top: 80rpx;
 }
 
@@ -138,7 +145,8 @@
  *   包一层 width: 100% 的 view，按钮作为它的子元素才能撑满。
  */
 .submit-wrap {
-  width: 100%;
+  /* 同 .input-wrap，用 stretch 而不是 width: 100% */
+  align-self: stretch;
   margin-top: 28rpx;
 }
 
@@ -187,7 +195,7 @@
    ============================================================ */
 
 .warn {
-  margin-top: 48rpx;
+  margin-top: 28rpx;
   font-size: 22rpx;
   letter-spacing: 0.06em;
   color: #5a5956;
@@ -196,7 +204,7 @@
 }
 
 .error {
-  margin-top: 48rpx;
+  margin-top: 28rpx;
   font-size: 22rpx;
   letter-spacing: 0.06em;
   color: #d9705f;
