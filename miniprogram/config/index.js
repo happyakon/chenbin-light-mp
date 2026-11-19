@@ -1,15 +1,15 @@
 /**
  * 全局配置 —— 开发 / 生产环境切换
  *
- * ★ 本地开发：用 ENV = 'local'（默认）
- * ★ 提交微信审核 / 发布：改成 ENV = 'prod'
+ * ★ 本地开发：用 ENV = 'local'
+ * ★ 体验版 / 正式版：用 ENV = 'prod'
  *
  * 为什么要这样：
  *   小程序只能请求 HTTPS + 已备案域名，
- *   但本地开发时域名还没下来，得用局域网 IP 或 localhost 调试。
+ *   但本地开发时得用局域网 IP 或公网 IP 调试。
  *   开发者工具里可以勾「不校验合法域名」绕过限制。
  */
-const ENV = 'local';
+const ENV = 'prod';
 
 const CONFIG = {
   local: {
@@ -21,8 +21,17 @@ const CONFIG = {
   },
 
   prod: {
-    // 生产：备案通过的域名，必须有 HTTPS
-    baseUrl: 'https://photo.example.com',
+    /*
+     * 生产：用 photo-api 子域而不是 photo。
+     *
+     * 为什么分开：
+     *   · 微信要求小程序用独立域名，方便后台配置
+     *   · 分开后能在 Caddy 日志里单独统计小程序流量
+     *   · 主站 photo. 只管网页，职责更清晰
+     *
+     * 两个域名反代到同一个后端（127.0.0.1:3000）。
+     */
+    baseUrl: 'https://photo-api.landshot.cn',
     debug: false,
   },
 };
