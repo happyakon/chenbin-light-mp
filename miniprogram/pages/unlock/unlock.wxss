@@ -1,8 +1,5 @@
 /* ============================================================
    相册解锁页
-   
-   背景用最朴素的纯色（用户要求还原成原来的），
-   只把锁图标区域做成「金色线框锁 + PRIVATE GALLERY」。
    ============================================================ */
 
 .unlock-page {
@@ -43,9 +40,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /*
-   * 底部留白比顶部多，视觉重心会上移。
-   */
+  /* 左右 88rpx 内边距，底部多留白让内容重心上移 */
   padding: 0 88rpx 220rpx;
   box-sizing: border-box;
 }
@@ -86,12 +81,10 @@
 
 .input-wrap {
   /*
-   * ★ 用 align-self: stretch 而不是 width: 100%
+   * ★ 用 align-self: stretch 撑满
    *
-   * .content 是 align-items: center 的 flex 容器。
-   * 在这种容器里，子元素的 width: 100% 表现不可靠
-   * （尤其 <button> 会被当成内容宽度）。
-   * stretch 是 flex 规范里「撑满交叉轴」的标准做法，最稳。
+   * .content 是 align-items: center 的 flex 容器，
+   * width: 100% 在这种容器里表现不稳定，用 stretch 最可靠。
    */
   align-self: stretch;
   margin-top: 80rpx;
@@ -130,60 +123,44 @@
 }
 
 /* ============================================================
-   按钮
+   进入按钮
    
-   微信 <button> 自带 margin:auto 和 padding，必须重置。
+   ★ 用 <view> 而不是 <button>
+   
+   小程序的 <button> 有独立的宽度计算逻辑，
+   实测以下方式都无法让它和输入框等宽：
+     · width: 100%
+     · 包一层 width: 100% 的父 view
+     · align-self: stretch
+   按钮永远比输入框窄一截。
+   
+   换成 <view> 后 width: 100% 立刻生效。
+   样式本来就是自己写的，视觉上和 button 完全一样。
    ============================================================ */
 
-/*
- * 按钮外层容器
- *
- * ★ 为什么必须有这一层
- *   .content 是 align-items: center 的 flex 容器，
- *   <button> 在里面会被当成「内容宽度」的项，
- *   直接写 width: 100% 也撑不满（百分比相对自身内容算）。
- *   包一层 width: 100% 的 view，按钮作为它的子元素才能撑满。
- */
-.submit-wrap {
-  /* 同 .input-wrap，用 stretch 而不是 width: 100% */
-  align-self: stretch;
-  margin-top: 28rpx;
-}
-
-/*
- * 提交按钮
- *
- * 微信 <button> 默认样式必须清掉：
- *   display: block  → 宽度不是 100%
- *   margin: auto    → 左右自动边距，视觉偏移
- *   padding: 14px   → 配合 width:100% 会溢出
- *   min-width       → 窄屏下比输入框宽
- */
 .submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /*
+   * 和 .input-wrap 用同样的方式撑满，
+   * 保证两者宽度严格一致。
+   */
+  align-self: stretch;
   width: 100%;
-  /* 和 .input 保持一致，都是 100rpx */
   height: 100rpx;
-  margin: 0;
-  padding: 0;
+  margin-top: 28rpx;
   border-radius: 16rpx;
   border: 1rpx solid #c9a86a;
   background: rgba(201, 168, 106, 0.1);
   color: #c9a86a;
   font-size: 30rpx;
   letter-spacing: 0.3em;
+  /* 字距会在末尾多算空白，text-indent 补回来才真正居中 */
   text-indent: 0.3em;
-  /* 用 flex 居中，不需要 line-height 撑高度 */
-  line-height: normal;
   box-sizing: border-box;
-  min-width: 0;
-  overflow: visible;
-}
 
-.submit::after {
-  border: none;
+  /* 文字居中：view 没有 button 的默认居中，要自己写 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .submit.is-disabled {

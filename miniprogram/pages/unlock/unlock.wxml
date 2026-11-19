@@ -6,7 +6,7 @@
   </view>
 
   <view class="content">
-    <!-- 锁图标：恢复成 emoji -->
+    <!-- 锁图标 -->
     <view class="lock-icon">🔒</view>
 
     <view class="album-title">{{albumTitle || '该相册'}}</view>
@@ -29,21 +29,22 @@
     </view>
 
     <!--
-      按钮必须包一层全宽 view
-      
-      为什么：.content 是 align-items: center 的 flex 容器，
-      <button> 在这种容器里不会自动撑满，
-      width: 100% 会按内容宽度算，比输入框窄。
-      包一层 width: 100% 的 view，按钮在里面才能真正撑满。
+      进入按钮（用普通容器实现，不用原生按钮组件）
+
+      原生按钮组件有独立的宽度计算逻辑，实测以下方式
+      都无法让它和输入框等宽，永远窄一截：
+        width 100%
+        包一层全宽父容器
+        align-self stretch
+
+      普通容器没有默认样式，宽度完全听 CSS 的。
+      样式本来就是自己写的，视觉上完全一样。
     -->
-    <view class="submit-wrap">
-      <button
-        class="submit {{submitting || retryAfter > 0 ? 'is-disabled' : ''}}"
-        disabled="{{submitting || retryAfter > 0}}"
-        bindtap="onSubmit"
-      >
-        {{submitting ? '验证中…' : '进入'}}
-      </button>
+    <view
+      class="submit {{submitting || retryAfter > 0 ? 'is-disabled' : ''}}"
+      bindtap="onSubmit"
+    >
+      {{submitting ? '验证中…' : '进入'}}
     </view>
 
     <!-- 错误 / 锁定提示 -->
