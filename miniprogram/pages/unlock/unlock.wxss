@@ -129,16 +129,27 @@
    ============================================================ */
 
 /*
+ * 按钮外层容器
+ *
+ * ★ 为什么必须有这一层
+ *   .content 是 align-items: center 的 flex 容器，
+ *   <button> 在里面会被当成「内容宽度」的项，
+ *   直接写 width: 100% 也撑不满（百分比相对自身内容算）。
+ *   包一层 width: 100% 的 view，按钮作为它的子元素才能撑满。
+ */
+.submit-wrap {
+  width: 100%;
+  margin-top: 28rpx;
+}
+
+/*
  * 提交按钮
  *
- * ★ 微信 <button> 有一堆默认样式必须清掉，否则和输入框对不齐：
- *     display: block  → 默认宽度不是 100%
- *     margin: auto    → 左右自动边距，视觉上偏移
- *     padding: 14px   → 加上 width:100% 会溢出
- *     min-width       → 有最小值，窄屏下比输入框宽
- *
- * 所以这里显式重设：宽度高度和输入框完全一致（104rpx），
- * padding 归零，margin 只留上边距。
+ * 微信 <button> 默认样式必须清掉：
+ *   display: block  → 宽度不是 100%
+ *   margin: auto    → 左右自动边距，视觉偏移
+ *   padding: 14px   → 配合 width:100% 会溢出
+ *   min-width       → 窄屏下比输入框宽
  */
 .submit {
   display: flex;
@@ -147,8 +158,7 @@
   width: 100%;
   /* 和 .input 保持一致，都是 100rpx */
   height: 100rpx;
-  /* 只留上边距，左右必须为 0，否则会和输入框错位 */
-  margin: 28rpx 0 0 0;
+  margin: 0;
   padding: 0;
   border-radius: 16rpx;
   border: 1rpx solid #c9a86a;

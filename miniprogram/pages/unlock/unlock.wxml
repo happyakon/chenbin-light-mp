@@ -28,13 +28,23 @@
       />
     </view>
 
-    <button
-      class="submit {{submitting || retryAfter > 0 ? 'is-disabled' : ''}}"
-      disabled="{{submitting || retryAfter > 0}}"
-      bindtap="onSubmit"
-    >
-      {{submitting ? '验证中…' : '进入'}}
-    </button>
+    <!--
+      按钮必须包一层全宽 view
+      
+      为什么：.content 是 align-items: center 的 flex 容器，
+      <button> 在这种容器里不会自动撑满，
+      width: 100% 会按内容宽度算，比输入框窄。
+      包一层 width: 100% 的 view，按钮在里面才能真正撑满。
+    -->
+    <view class="submit-wrap">
+      <button
+        class="submit {{submitting || retryAfter > 0 ? 'is-disabled' : ''}}"
+        disabled="{{submitting || retryAfter > 0}}"
+        bindtap="onSubmit"
+      >
+        {{submitting ? '验证中…' : '进入'}}
+      </button>
+    </view>
 
     <!-- 错误 / 锁定提示 -->
     <view wx:if="{{retryAfter > 0}}" class="warn">{{lockText}}</view>
