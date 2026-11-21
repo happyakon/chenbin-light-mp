@@ -22,6 +22,8 @@ const DEFAULTS = {
 
 Page({
   data: {
+    /* 上滑检测：按下时的 Y 坐标 */
+    touchStartY: 0,
     statusBarHeight: 20,
 
     /** 背景图 URL（空则用 CSS 绘制的默认山景） */
@@ -82,7 +84,37 @@ Page({
   },
 
   /** 点任意位置 → 进摄影集 */
-  onTapScreen() {
+  /*
+   * 上滑进入摄影集
+   *
+   * 判断逻辑：
+   *   松手时的 Y 比按下时小 60px 以上 → 认定是上滑
+   *
+   * 为什么不用 catchtouchmove：
+   *   页面可能有滚动，catch 掉会阻止滚动。
+   *   这里只在 touchstart / touchend 记录坐标，不干扰中间过程。
+   */
+  onTouchStart(e) {
+    const t = e.touches && e.touches[0];
+    if (t) this.setData({ touchStartY: t.clientY });
+  },
+
+  onTouchEnd(e) {
+    const start = this.data.touchStartY;
+    if (!start) return;
+
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t) return;
+
+    const deltaY = start - t.clientY;
+
+    /* 上滑超过 60px 才触发，避免误触 */
+    if (deltaY >= 60) {
+      this.enterCollections();
+    }
+  },
+
+  enterCollections() {
     wx.switchTab({
       url: '/pages/collections/collections',
       fail: (err) => {

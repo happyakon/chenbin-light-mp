@@ -1,7 +1,7 @@
 <view class="list-page">
   <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
 
-  <view class="nav">
+  <view class="nav" style="padding-right:{{safeRight}}px">
     <view class="back" bindtap="goBack">‹</view>
     <view class="title">{{title}}</view>
     <view class="count">{{photos.length}} 张</view>

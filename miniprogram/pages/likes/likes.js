@@ -5,6 +5,7 @@
  */
 import { get } from '../../utils/request.js';
 import { imgUrl, setPendingList } from '../../utils/image.js';
+import { getNavMetrics } from '../../utils/nav-bar.js';
 import { IS_DEBUG } from '../../config/index.js';
 
 Page({
@@ -17,6 +18,8 @@ Page({
     emptyText: '还没有点赞',
     emptyHint: '在照片上点 ♡ 表示喜欢',
     statusBarHeight: 20,
+      /* 右上角胶囊按钮占用的宽度，导航栏右侧要让出来 */
+      safeRight: 95,
     title: '我的点赞',
   },
 
@@ -28,7 +31,9 @@ Page({
       if (info && info.statusBarHeight) statusBarHeight = info.statusBarHeight;
     } catch (_) {}
 
-    this.setData({ statusBarHeight });
+    /* 量出胶囊位置，让导航栏避开右上角的三个点 */
+      const navMetrics = getNavMetrics();
+      this.setData({ statusBarHeight, ...navMetrics });
     this.load();
   },
 

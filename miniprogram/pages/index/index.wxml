@@ -13,7 +13,7 @@
   ★ 文字默认值写死在 WXML，JS 拿到配置后才覆盖。
     即使接口失败，页面也能正常显示。
 -->
-<view class="index-page" bindtap="onTapScreen">
+<view class="index-page" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
   <!-- ============ 背景层 ============ -->
   <!--
     有配置背景图时：
@@ -82,7 +82,7 @@
 
   <view class="enter">
     <view class="enter-line"></view>
-    <view class="enter-text">轻触进入</view>
-    <view class="enter-arrow">↓</view>
+    <view class="enter-text">上滑进入</view>
+    <view class="enter-arrow">↑</view>
   </view>
 </view>
