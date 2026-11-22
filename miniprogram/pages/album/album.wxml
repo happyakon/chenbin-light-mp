@@ -166,7 +166,6 @@
     <view class="info-bar {{expanded ? 'is-up' : ''}}">
       <view class="info-left">
         <text class="album-name">{{albumTitle}}</text>
-        <text class="counter">{{current + 1}} / {{photos.length}}</text>
       </view>
       <view class="info-right">
         <view class="act" catchtap="toggleLike">

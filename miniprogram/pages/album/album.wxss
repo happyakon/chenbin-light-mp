@@ -452,13 +452,6 @@
   white-space: nowrap;
 }
 
-.counter {
-  font-size: 22rpx;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.45);
-  flex: 0 0 auto;
-}
-
 .info-right {
   display: flex;
   align-items: center;
