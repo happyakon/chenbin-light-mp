@@ -40,13 +40,6 @@
         </view>
       </view>
 
-      <!-- 断点续看提示 -->
-      <view wx:if="{{showResumeTip}}" class="resume-tip">
-        <text class="rt-text">上次看到第 {{lastSeen + 1}} 张</text>
-        <view class="rt-btn" catchtap="onResumeTap">继续看</view>
-        <view class="rt-close" catchtap="onResumeClose">×</view>
-      </view>
-
       <!-- 瀑布流（3 列） -->
       <view class="masonry">
         <view class="m-col">
@@ -166,6 +159,7 @@
     <view class="info-bar {{expanded ? 'is-up' : ''}}">
       <view class="info-left">
         <text class="album-name">{{albumTitle}}</text>
+          <text class="counter">{{current + 1}} / {{photos.length}}</text>
       </view>
       <view class="info-right">
         <view class="act" catchtap="toggleLike">

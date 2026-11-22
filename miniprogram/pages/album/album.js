@@ -7,10 +7,6 @@
  * 为什么要照片墙：
  *   直接全屏浏览时，用户不知道相册里有多少张、都长什么样，
  *   也没法跳着看。照片墙给的是「整体印象 + 快速跳转」。
- *
- * 断点续看：
- *   记录用户上次看到第几张，下次进来滚动到那个位置，
- *   并且弹一个「上次看到第 N 张，继续看？」的提示。
  */
 import { get, post, del } from '../../utils/request.js';
 import { imgUrl, getAlbumToken, takePendingList } from '../../utils/image.js';
@@ -20,8 +16,6 @@ import { EXIF_FIELDS, IS_DEBUG } from '../../config/index.js';
 const PANEL_THRESHOLD = 60;
 /** 快速上滑速度阈值（px/ms） */
 const FLING_VELOCITY = 0.5;
-/** 断点记录的 storage 前缀 */
-const PROGRESS_PREFIX = 'album_progress_';
 
 Page({
   data: {
@@ -49,12 +43,6 @@ Page({
      *        左右滑动不跨出这个列表，也不显示照片墙。
      */
     listMode: false,
-
-    /* ---------------- 断点续看 ---------------- */
-    /** 上次看到的索引（-1 = 没有记录） */
-    lastSeen: -1,
-    /** 断点提示是否显示 */
-    showResumeTip: false,
 
     /* ---------------- EXIF 面板 ---------------- */
     expanded: false,
@@ -113,15 +101,6 @@ Page({
     }
 
     this.loadPhotos(focus);
-  },
-
-  onHide() {
-    // 页面隐藏时保存进度
-    this.saveProgress();
-  },
-
-  onUnload() {
-    this.saveProgress();
   },
 
   /**
@@ -215,7 +194,7 @@ Page({
         loading: false,
         mode: 'viewer',
         current: found >= 0 ? found : 0,
-        /* 限定列表模式不显示照片墙、不记断点 */
+        /* 限定列表模式不显示照片墙 */
         listMode: true,
       });
 
@@ -290,10 +269,6 @@ Page({
         return;
       }
 
-      // 读上次看到哪
-      const lastSeen = this.readProgress();
-      const validLast = lastSeen >= 0 && lastSeen < photos.length ? lastSeen : -1;
-
       const cols = this.splitColumns(photos);
 
       this.setData({
@@ -305,8 +280,6 @@ Page({
         coverUrl: this.resolveCover(data.album, photos),
         loading: false,
         mode: 'grid',
-        lastSeen: validLast,
-        showResumeTip: validLast > 0,
       });
     } catch (err) {
       if (IS_DEBUG) console.warn('[album] 加载失败', err);
@@ -395,54 +368,6 @@ Page({
     return '';
   },
 
-  /* ---------------------------------------------------------- 断点续看 */
-
-  /** storage key */
-  progressKey() {
-    return PROGRESS_PREFIX + this.data.album;
-  },
-
-  /** 读上次看到的索引 */
-  readProgress() {
-    try {
-      const v = wx.getStorageSync(this.progressKey());
-      return typeof v === 'number' && v >= 0 ? v : -1;
-    } catch (_) {
-      return -1;
-    }
-  },
-
-  /** 保存当前进度 */
-  saveProgress() {
-    /*
-     * 限定列表模式不记进度。
-     *
-     * 因为那时 photos 是「收藏的几张」，
-     * current 是它在收藏列表里的索引，
-     * 存下来会导致下次正常进相册时跳到错误位置。
-     */
-    if (this.data.listMode) return;
-
-    if (this.data.mode !== 'viewer') return;
-    if (!this.data.photos.length) return;
-    try {
-      wx.setStorageSync(this.progressKey(), this.data.current);
-    } catch (_) {}
-  },
-
-  /** 点「继续看」 */
-  onResumeTap() {
-    const idx = this.data.lastSeen;
-    if (idx < 0) return;
-    this.enterViewer(idx);
-    this.setData({ showResumeTip: false });
-  },
-
-  /** 关掉断点提示 */
-  onResumeClose() {
-    this.setData({ showResumeTip: false });
-  },
-
   /* ---------------------------------------------------------- 照片墙 */
 
   /** 点照片墙里的某张 → 进全屏浏览 */
@@ -461,7 +386,6 @@ Page({
       dragProgress: 0,
     });
     this.updateExif(index);
-    this.saveProgress();
   },
 
   /** 从全屏浏览返回照片墙 */
@@ -478,7 +402,6 @@ Page({
       return;
     }
 
-    this.saveProgress();
     this.setData({ mode: 'grid', expanded: false, dragProgress: 0 });
   },
 
@@ -508,7 +431,6 @@ Page({
     const idx = e.detail.current;
     this.setData({ current: idx });
     this.updateExif(idx);
-    this.saveProgress();
   },
 
   /* ---------------------------------------------------------- 手势 */
