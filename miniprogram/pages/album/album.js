@@ -442,6 +442,31 @@ Page({
     this._startTime = Date.now();
     this._moving = false;
     this._isHorizontal = false;
+    this._fromPanel = false;
+  },
+
+  /**
+   * EXIF 面板上的触摸开始
+   *
+   * 和照片区的区别：面板里有一个可滚动的参数列表。
+   * 如果列表没滚到顶，下拉应该先让列表滚，
+   * 滚到顶了再继续往下拉才收起面板。
+   *
+   * 所以这里多记一个「从面板来」的标记和当前滚动位置。
+   */
+  onPanelTouchStart(e) {
+    if (e.touches.length !== 1) return;
+    this._startY = e.touches[0].clientY;
+    this._startX = e.touches[0].clientX;
+    this._startTime = Date.now();
+    this._moving = false;
+    this._isHorizontal = false;
+    this._fromPanel = true;
+  },
+
+  /** 记录参数列表的滚动位置 */
+  onExifScroll(e) {
+    this._exifScrollTop = e.detail.scrollTop;
   },
 
   onTouchMove(e) {
@@ -468,6 +493,22 @@ Page({
     }
 
     if (dy < 0) return;
+
+    /*
+     * 从 EXIF 面板拖的：列表没滚到顶时，让列表自己滚，不要收面板。
+     *
+     * 为什么要这个判断：
+     *   参数多的时候列表可以滚动，用户往下拖是想看上面的参数，
+     *   如果直接收起面板，就滑不动列表了。
+     *   只有滚到顶（scrollTop 接近 0）再往下拉，才是「收起面板」的意图。
+     *
+     * 阈值 2px：手指微抖时不至于误判。
+     */
+    if (this._fromPanel && (this._exifScrollTop || 0) > 2) {
+      this.setData({ dragging: null });
+      return;
+    }
+
     const progress = Math.max(0, 1 - dy / PANEL_THRESHOLD);
     this.setData({ dragging: 'down', dragY: dy, dragProgress: progress });
   },
@@ -496,7 +537,13 @@ Page({
         this.setData({ dragging: null, dragY: 0, dragProgress: 0 });
       }
     } else {
-      if ((dy > 0 && far) || (fast && dy > 0)) {
+      /*
+       * 从面板拖的、且列表没滚到顶 → 这只是滚动列表，不是收面板。
+       * 停在松开位置，不要改 expanded。
+       */
+      if (this._fromPanel && (this._exifScrollTop || 0) > 2 && dy > 0) {
+        this.setData({ dragging: null, dragY: 0, dragProgress: 1 });
+      } else if ((dy > 0 && far) || (fast && dy > 0)) {
         this.setData({ expanded: false, dragging: null, dragY: 0, dragProgress: 0 });
       } else {
         this.setData({ dragging: null, dragY: 0, dragProgress: 1 });
@@ -505,6 +552,7 @@ Page({
 
     this._startY = null;
     this._moving = false;
+    this._fromPanel = false;
   },
 
   /** 收起面板 */

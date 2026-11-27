@@ -23,6 +23,8 @@ Page({
     statusBarHeight: 20,
     /** 卡片中间叠加的金色线框锁（base64 SVG） */
     lockIcon: LOCK_ICON_SMALL,
+    /** 顶部轮播图（小程序独立的一套，3:2，最多 5 张） */
+    hero: [],
   },
 
   onLoad() {
@@ -88,7 +90,21 @@ Page({
         }
       }
 
-      this.setData({ allAlbums: all, loading: false });
+      /*
+       * 轮播图：小程序独立的一套（/api/collections 返回的 mpHero 字段）。
+       * 和 Web 首页轮播是不同的数据源，比例也不同（这边 3:2）。
+       *
+       * 用 medium 档（1280 宽）而不是 hero 档（3200）：
+       *   3:2 卡片在 3x 屏上约 1125 物理像素，medium 就够，
+       *   用 hero 档要多下载一倍多的流量。
+       */
+      const hero = ((data && data.mpHero) || []).map((h) => ({
+        path: h.path,
+        /* 第 2 个参数传相册 key，加锁相册才能拼上 ?t= 凭证 */
+        medium: imgUrl(h.medium || h.thumb || '', h.album),
+      }));
+
+      this.setData({ allAlbums: all, loading: false, hero });
       this.applyFilter(this.data.activeCollection, false);
 
       /* 记下当前 token 指纹，onShow 时用来判断有没有新的解锁 */

@@ -135,12 +135,23 @@
       </view>
     </view>
 
-    <!-- EXIF 面板 -->
-    <view class="exif-panel {{expanded ? 'is-open' : ''}} {{dragging ? 'is-dragging' : ''}}">
+    <!--
+      EXIF 面板
+
+      手势也要绑在这里：原来只有照片区能拖动面板，
+      在参数列表上下拉没反应，体验很割裂。
+      现在整块面板都能拖动收起，但列表没滚到顶时先让它自己滚。
+    -->
+    <view
+      class="exif-panel {{expanded ? 'is-open' : ''}} {{dragging ? 'is-dragging' : ''}}"
+      bindtouchstart="onPanelTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+    >
       <view class="panel-handle" bindtap="onTapPhoto">
         <view class="panel-bar"></view>
       </view>
-      <scroll-view class="exif-scroll" scroll-y>
+      <scroll-view class="exif-scroll" scroll-y bindscroll="onExifScroll">
         <view wx:if="{{noExif}}" class="no-exif">无参数信息</view>
         <view wx:else class="exif-list">
           <view

@@ -7,6 +7,35 @@
     <view class="page-title">摄影集</view>
   </view>
 
+  <!--
+    轮播图（小程序独立的一套，3:2，最多 5 张）
+
+    和 Web 首页轮播分开设置：
+      Web     /api/hero      2.4:1
+      小程序   /api/mp-hero   3:2
+    控制台里是两个独立的入口。
+  -->
+  <swiper
+    wx:if="{{hero.length}}"
+    class="hero-swiper"
+    indicator-dots="{{hero.length > 1}}"
+    indicator-color="rgba(240,239,236,.22)"
+    indicator-active-color="rgba(201,168,106,.95)"
+    autoplay="{{hero.length > 1}}"
+    interval="4200"
+    duration="520"
+    circular
+  >
+    <swiper-item wx:for="{{hero}}" wx:key="path">
+      <image
+        class="hero-img"
+        src="{{item.medium}}"
+        mode="aspectFill"
+        lazy-load
+      />
+    </swiper-item>
+  </swiper>
+
   <!-- 横向筛选 chip -->
   <scroll-view class="chips" scroll-x enable-flex show-scrollbar="{{false}}">
     <view

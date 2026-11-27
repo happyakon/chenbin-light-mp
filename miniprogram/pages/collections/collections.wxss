@@ -30,7 +30,30 @@
   color: #f0efec;
 }
 
-/* ---------------------------------------------------------- 横向筛选 chip */
+/* ---------------------------------------------------------- 轮播图 */
+
+/*
+ * 3:2 横图。
+ * 小程序不支持 vh，用 aspect-ratio 定高：
+ * 宽度撑满（两侧 36rpx 边距，和标题对齐），高度自动 2/3。
+ */
+.hero-swiper {
+  flex: 0 0 auto;
+  width: 678rpx; /* 750 - 36×2 */
+  height: 452rpx; /* 678 ÷ 1.5 */
+  margin: 8rpx auto 28rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background: #141414;
+}
+
+.hero-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ------------------------------------------------ 横向筛选 chip */
 
 .chips {
   flex: 0 0 auto;
@@ -81,10 +104,15 @@
 
 .album {
   /*
-   * 双列布局，宽度必须算上 margin-right，否则总宽超 50% 会掉成单列。
-   * padding 28×2 = 56，间距 16，所以单列 = (100% - 72) / 2
+   * 双列布局。
+   *
+   * ★ 这里只扣「列间距 16rpx」，不要再扣 padding。
+   *   .grid 已经设了 box-sizing:border-box，
+   *   子元素的 100% 本身就是扣掉 padding 之后的宽度。
+   *   之前写 calc((100% - 72rpx) / 2) 把 padding 扣了两次，
+   *   导致右边空出一条 56rpx 的空白、整体偏左。
    */
-  width: calc((100% - 72rpx) / 2);
+  width: calc((100% - 16rpx) / 2);
   margin-bottom: 22rpx;
   opacity: 0;
   transform: translate(0, 24rpx) scale(0.94);
