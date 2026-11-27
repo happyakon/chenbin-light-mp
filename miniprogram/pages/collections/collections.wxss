@@ -58,40 +58,55 @@
   display: block;
 }
 
-/* 有轮播图时，chips 上面留一点距离（图片紧挨着筛选条太挤） */
-.chips.has-hero {
-  padding-top: 20rpx;
+/* ---------------------------------------------------------- 分组 */
+
+/*
+ * 按摄影集分组（和 Web 首页一致）。
+ * 每段一个标题：大号序号 + 中文标题 + 英文副标题。
+ */
+.collection-block {
+  margin-bottom: 20rpx;
 }
 
-/* ------------------------------------------------ 横向筛选 chip */
+/* 第一段若紧接轮播图，留点上边距 */
+.collection-block:first-child {
+  padding-top: 24rpx;
+}
 
-.chips {
-  flex: 0 0 auto;
-  white-space: nowrap;
-  padding: 0 36rpx 24rpx;
+.collection-head {
   display: flex;
-  box-sizing: border-box;
+  align-items: baseline;
+  gap: 20rpx;
+  padding: 26rpx 28rpx 18rpx;
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  height: 60rpx;
-  padding: 0 28rpx;
-  margin-right: 16rpx;
-  border-radius: 30rpx;
-  border: 1rpx solid rgba(240, 239, 236, 0.1);
-  font-size: 24rpx;
-  letter-spacing: 0.04em;
-  color: #8a8884;
-  transition: all 0.24s ease;
+.collection-no {
+  font-family: var(--font-latin, "Helvetica Neue", Arial, sans-serif);
+  font-size: 28rpx;
+  letter-spacing: 0.1em;
+  color: rgba(201, 168, 106, 0.9);
+  font-weight: 300;
 }
 
-.chip.is-active {
-  border-color: #c9a86a;
-  color: #c9a86a;
-  background: rgba(201, 168, 106, 0.1);
+.collection-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.collection-title {
+  font-family: "Songti SC", "SimSun", serif;
+  font-size: 34rpx;
+  letter-spacing: 0.14em;
+  color: #f0efec;
+}
+
+.collection-en {
+  font-family: var(--font-latin, "Helvetica Neue", Arial, sans-serif);
+  font-size: 19rpx;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #7a7873;
 }
 
 /* ---------------------------------------------------------- 滚动区 */

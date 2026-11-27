@@ -7,18 +7,14 @@
 import { get } from '../../utils/request.js';
 import { imgUrl, getAlbumToken } from '../../utils/image.js';
 import { LOCK_ICON_SMALL } from '../../utils/lock-icon.js';
-import { COLLECTION_TABS, IS_DEBUG } from '../../config/index.js';
+import { IS_DEBUG } from '../../config/index.js';
 
 Page({
   data: {
-    /** 当前选中的摄影集 key，空 = 全部 */
-    activeCollection: '',
-    /** 筛选项 */
-    tabs: COLLECTION_TABS,
-    /** 全部相册（原始） */
+    /** 全部相册（原始，扁平） */
     allAlbums: [],
-    /** 当前显示的相册 */
-    albums: [],
+    /** 按摄影集分组的相册（用于渲染，和 Web 首页一样） */
+    groups: [],
     loading: true,
     statusBarHeight: 20,
     /** 卡片中间叠加的金色线框锁（base64 SVG） */
@@ -91,6 +87,39 @@ Page({
       }
 
       /*
+       * 按摄影集分组（和 Web 首页一样）
+       *
+       * 直接按 data.collections 的顺序和结构建组，
+       * 每个组里放该摄影集的相册，加上序号。
+       *
+       * 为什么不用扁平的 allAlbums 再自己分组：
+       *   后端返回的就是「摄影集 → 相册」的两层结构，
+       *   照它走最省事，也天然保证了顺序（collections 按 order 排序）。
+       */
+      const groups = [];
+      for (const col of data.collections || []) {
+        const albums = all
+          .filter((a) => a.collectionKey === col.key)
+          .map((a, i) => ({
+            ...a,
+            animDelay: i * 40,
+            animFrom: i % 2 === 0 ? 'left' : 'right',
+            animIn: false,
+          }));
+
+        /* 空摄影集不渲染，免得出现只有标题没有卡片的段 */
+        if (!albums.length) continue;
+
+        groups.push({
+          key: col.key,
+          no: String(groups.length + 1).padStart(2, '0'),
+          title: col.title || col.key,
+          en: col.en || '',
+          albums,
+        });
+      }
+
+      /*
        * 轮播图：小程序独立的一套（/api/collections 返回的 mpHero 字段）。
        * 和 Web 首页轮播是不同的数据源，比例也不同（这边 3:2）。
        *
@@ -104,8 +133,17 @@ Page({
         medium: imgUrl(h.medium || h.thumb || '', h.album),
       }));
 
-      this.setData({ allAlbums: all, loading: false, hero });
-      this.applyFilter(this.data.activeCollection, false);
+      this.setData({ allAlbums: all, groups, loading: false, hero });
+
+      /* 入场动画：等一帧再打 is-in，否则没有过渡效果 */
+      setTimeout(() => {
+        this.setData({
+          groups: this.data.groups.map((g) => ({
+            ...g,
+            albums: g.albums.map((a) => ({ ...a, animIn: true })),
+          })),
+        });
+      }, 60);
 
       /* 记下当前 token 指纹，onShow 时用来判断有没有新的解锁 */
       this._lastTokenSig = this.tokenSignature();
@@ -113,37 +151,6 @@ Page({
       if (IS_DEBUG) console.warn('[collections] 加载失败', err);
       this.setData({ loading: false });
     }
-  },
-
-  /** 应用筛选 */
-  applyFilter(collectionKey, animate = true) {
-    const all = this.data.allAlbums;
-    const filtered = collectionKey
-      ? all.filter((a) => a.collectionKey === collectionKey)
-      : all;
-
-    const albums = filtered.map((a, i) => ({
-      ...a,
-      animDelay: i * 40,
-      animFrom: i % 2 === 0 ? 'left' : 'right',
-      animIn: !animate,
-    }));
-
-    this.setData({ activeCollection: collectionKey, albums }, () => {
-      if (!animate) return;
-      setTimeout(() => {
-        this.setData({
-          albums: this.data.albums.map((a) => ({ ...a, animIn: true })),
-        });
-      }, 30);
-    });
-  },
-
-  /** 点筛选项 */
-  onTabTap(e) {
-    const key = e.currentTarget.dataset.key || '';
-    if (key === this.data.activeCollection) return;
-    this.applyFilter(key);
   },
 
   /** 点相册 */
@@ -251,8 +258,15 @@ Page({
 
     if (!changed) return;
 
-    this.setData({ allAlbums: next });
-    this.applyFilter(this.data.activeCollection, false);
+    /* 同步更新分组里的同一批数据（groups 是渲染用的数据源） */
+    const byKey = new Map(next.map((a) => [a.key, a]));
+    this.setData({
+      allAlbums: next,
+      groups: this.data.groups.map((g) => ({
+        ...g,
+        albums: g.albums.map((a) => byKey.get(a.key) || a),
+      })),
+    });
   },
 
   onShareAppMessage() {

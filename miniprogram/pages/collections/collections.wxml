@@ -41,24 +41,6 @@
     </view>
   </block>
 
-  <!-- 横向筛选 chip -->
-  <scroll-view
-    class="chips {{hero.length ? 'has-hero' : ''}}"
-    scroll-x
-    enable-flex
-    show-scrollbar="{{false}}"
-  >
-    <view
-      wx:for="{{tabs}}"
-      wx:key="key"
-      class="chip {{activeCollection === item.key ? 'is-active' : ''}}"
-      data-key="{{item.key}}"
-      bindtap="onTabTap"
-    >
-      {{item.label}}
-    </view>
-  </scroll-view>
-
   <!-- 加载骨架 -->
   <scroll-view wx:if="{{loading}}" class="scroll-area" scroll-y>
     <view class="grid">
@@ -72,83 +54,114 @@
     </view>
   </scroll-view>
 
-  <!-- 相册网格 -->
+  <!--
+    按摄影集分组展示（和 Web 首页一样）
+
+    每个摄影集一段：
+      01  风光摄影集
+          LANDSCAPE
+          ┌────┬────┐
+          │相册│相册│
+          └────┴────┘
+      02  儿童摄影集
+          ...
+
+    去掉了顶部的「全部/风光/儿童/人像」筛选条，
+    改成一次性往下滚，分组标题就是分隔。
+  -->
   <scroll-view wx:else class="scroll-area" scroll-y>
-    <view wx:if="{{albums.length}}" class="grid">
+    <block wx:if="{{groups.length}}">
       <view
-        wx:for="{{albums}}"
+        wx:for="{{groups}}"
         wx:key="key"
-        class="album {{item.animIn ? 'is-in' : ''}} from-{{item.animFrom}}"
-        style="transition-delay:{{item.animDelay}}ms"
-        data-album="{{item}}"
-        bindtap="onAlbumTap"
+        wx:for-item="group"
+        class="collection-block"
       >
-        <view class="cover-wrap">
-          <image
-            wx:if="{{item.coverUrl}}"
-            class="cover {{item.coverBlurred ? 'is-blurred' : ''}}"
-            src="{{item.coverUrl}}"
-            mode="aspectFill"
-            lazy-load
-          />
-          <!--
-            既没封面又在加锁状态 → 用纯色占位兜底
-            （正常情况下后端会给 blur 档，走不到这里）
-          -->
-          <view wx:else class="cover cover-empty">
-            <view class="empty-glow"></view>
-            <view class="empty-grid"></view>
-            <view class="lock-badge">
-              <view class="lock-ring"></view>
-              <image class="lock-svg" src="{{lockIcon}}" mode="aspectFit" />
-            </view>
-            <view class="empty-caption">加密相册</view>
-          </view>
-
-          <view class="cover-shade"></view>
-
-          <!--
-            虚化封面中间叠「线框锁 + PRIVATE GALLERY」。
-            宽度占卡片的一半，居中。
-
-            为什么不用角上的小圆徽章：
-              小锁看不清是什么，信息量低；
-              中间大一点的标记能让用户一眼明白「这是加密相册」。
-          -->
-          <view wx:if="{{item.coverBlurred}}" class="lock-overlay">
-            <image class="lock-overlay-svg" src="{{lockIcon}}" mode="aspectFit" />
-            <view class="lock-overlay-text">Private Gallery</view>
-          </view>
-
-          <!--
-            右上角小锁徽章
-            和中间的线框锁用同一套图标（也是 SVG，不是 emoji），
-            保证视觉统一。
-          -->
-          <view wx:if="{{item.locked}}" class="badge">
-            <image class="badge-lock" src="{{lockIcon}}" mode="aspectFit" />
-          </view>
-
-          <!--
-            未解锁时在底部压一条「需要密码」，
-            提示这张卡不是坏了，是要密码。
-          -->
-          <view wx:if="{{item.coverBlurred}}" class="need-pass">需要密码</view>
-
-          <view class="cover-text">
-            <view class="cn">{{item.title}}</view>
-            <view wx:if="{{item.en}}" class="en">{{item.en}}</view>
+        <!-- 分组头：序号 + 中文标题 + 英文副标题 -->
+        <view class="collection-head">
+          <text class="collection-no">{{group.no}}</text>
+          <view class="collection-titles">
+            <text class="collection-title">{{group.title}}</text>
+            <text class="collection-en">{{group.en}}</text>
           </view>
         </view>
-        <view class="count">{{item.count}} 张</view>
+
+        <!-- 该摄影集下的相册 -->
+        <view class="grid">
+          <view
+            wx:for="{{group.albums}}"
+            wx:key="key"
+            class="album {{item.animIn ? 'is-in' : ''}} from-{{item.animFrom}}"
+            style="transition-delay:{{item.animDelay}}ms"
+            data-album="{{item}}"
+            bindtap="onAlbumTap"
+          >
+            <view class="cover-wrap">
+              <image
+                wx:if="{{item.coverUrl}}"
+                class="cover {{item.coverBlurred ? 'is-blurred' : ''}}"
+                src="{{item.coverUrl}}"
+                mode="aspectFill"
+                lazy-load
+              />
+              <!--
+                既没封面又在加锁状态 → 用纯色占位兜底
+                （正常情况下后端会给 blur 档，走不到这里）
+              -->
+              <view wx:else class="cover cover-empty">
+                <view class="empty-glow"></view>
+                <view class="empty-grid"></view>
+                <view class="lock-badge">
+                  <view class="lock-ring"></view>
+                  <image class="lock-svg" src="{{lockIcon}}" mode="aspectFit" />
+                </view>
+                <view class="empty-caption">加密相册</view>
+              </view>
+
+              <view class="cover-shade"></view>
+
+              <!--
+                虚化封面中间叠「线框锁 + PRIVATE GALLERY」。
+                宽度占卡片的一半，居中。
+
+                为什么不用角上的小圆徽章：
+                  小锁看不清是什么，信息量低；
+                  中间大一点的标记能让用户一眼明白「这是加密相册」。
+              -->
+              <view wx:if="{{item.coverBlurred}}" class="lock-overlay">
+                <image class="lock-overlay-svg" src="{{lockIcon}}" mode="aspectFit" />
+                <view class="lock-overlay-text">Private Gallery</view>
+              </view>
+
+              <!--
+                右上角小锁徽章
+                和中间的线框锁用同一套图标（也是 SVG，不是 emoji），
+                保证视觉统一。
+              -->
+              <view wx:if="{{item.locked}}" class="badge">
+                <image class="badge-lock" src="{{lockIcon}}" mode="aspectFit" />
+              </view>
+
+              <!--
+                未解锁时在底部压一条「需要密码」，
+                提示这张卡不是坏了，是要密码。
+              -->
+              <view wx:if="{{item.coverBlurred}}" class="need-pass">需要密码</view>
+
+              <view class="cover-text">
+                <view class="cn">{{item.title}}</view>
+                <view wx:if="{{item.en}}" class="en">{{item.en}}</view>
+              </view>
+            </view>
+            <view class="count">{{item.count}} 张</view>
+          </view>
+        </view>
       </view>
-    </view>
+    </block>
 
     <view wx:else class="state-box">
       <view class="state-dots">· · ·</view>
-      <view class="state-text">
-        {{activeCollection ? '这个摄影集还没有相册' : '还没有相册'}}
-      </view>
+      <view class="state-text">还没有相册</view>
     </view>
   </scroll-view>
 </view>
