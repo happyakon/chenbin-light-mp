@@ -7,7 +7,7 @@
 import { get } from '../../utils/request.js';
 import { imgUrl, getAlbumToken } from '../../utils/image.js';
 import { LOCK_ICON_SMALL } from '../../utils/lock-icon.js';
-import { IS_DEBUG } from '../../config/index.js';
+import { IS_DEBUG, ALBUM_TOKEN_PREFIX } from '../../config/index.js';
 
 Page({
   data: {
@@ -154,8 +154,16 @@ Page({
         });
       }, 60);
 
-      /* 记下当前 token 指纹，onShow 时用来判断有没有新的解锁 */
-      this._lastTokenSig = this.tokenSignature();
+      /*
+       * 不再记指纹了。
+       *
+       * 之前这里存 this.tokenSignature() 给 onShow 比对，
+       * 但那个值是在 setData 之后算的（此时 allAlbums 已填好），
+       * 而请求发出时 allAlbums 还是空的、根本没带 token。
+       * 两者不一致 → 解锁返回后判断成「没变化」→ 封面一直是虚化版。
+       *
+       * 现在 onShow 直接重新拉列表，不需要指纹了。
+       */
     } catch (err) {
       if (IS_DEBUG) console.warn('[collections] 加载失败', err);
       this.setData({ loading: false });
@@ -204,15 +212,37 @@ Page({
    * 为什么一次带上全部：
    *   /api/collections 一次返回所有相册，
    *   头里得覆盖到每一个已解锁的，否则那些相册的封面还是空的。
+   *
+   * ★ 不依赖 allAlbums
+   *   之前遍历 this.data.allAlbums 只取 locked 的，
+   *   但首次加载时 allAlbums 还是空的（列表都还没拉回来），
+   *   根本拼不出 token，请求就白发了。
+   *
+   *   现在直接扫 storage：凡是有 token 的都带上。
+   *   多带一个用不上的 token 不会出错，但漏带就会看不到封面。
    */
   collectAlbumTokens() {
-    const all = this.data.allAlbums || [];
     const parts = [];
 
-    for (const a of all) {
-      if (!a.locked) continue;
-      const t = getAlbumToken(a.key);
-      if (t) parts.push(a.key + ':' + t);
+    /* 相册 key 只允许字母数字和 - _ .，扫到的都是合法 key */
+    let keys = [];
+    try {
+      const info = wx.getStorageInfoSync();
+      keys = (info && info.keys) || [];
+    } catch (_) {
+      return '';
+    }
+
+    for (const k of keys) {
+      if (!k.startsWith(ALBUM_TOKEN_PREFIX)) continue;
+      const albumKey = k.slice(ALBUM_TOKEN_PREFIX.length);
+      let token = '';
+      try {
+        token = wx.getStorageSync(k) || '';
+      } catch (_) {
+        token = '';
+      }
+      if (albumKey && token) parts.push(albumKey + ':' + token);
     }
 
     return parts.join(',');
@@ -235,47 +265,14 @@ Page({
     if (!this.data.allAlbums.length) return;
 
     /*
-     * 已有数据 → 说明是从别的页面返回的。
-     * 有 token 变化（刚解锁）就重新拉，
-     * 没变化就只更新锁图标，省一次请求。
+     * 已有数据 → 说明是从别的页面返回的（比如刚解锁完、或看完相册回来）。
+     *
+     * ★ 直接重新拉，不做「指纹没变就跳过」的优化
+     *   那个优化出过问题：指纹的计算时机和请求实际发出的 token
+     *   不一致，导致解锁后判断成「没变化」，封面一直是虚化版。
+     *   一次列表请求很轻，比猜错划算。
      */
-    this.refreshTokenFlags();
-
-    if (this.tokenSignature() !== this._lastTokenSig) {
-      this.loadAlbums();
-    }
-  },
-
-  /** token 状态指纹：用来判断「有没有新的解锁」 */
-  tokenSignature() {
-    return this.collectAlbumTokens();
-  },
-
-  /** 重新算每个相册的 hasToken */
-  refreshTokenFlags() {
-    const all = this.data.allAlbums || [];
-    if (!all.length) return;
-
-    let changed = false;
-    const next = all.map((a) => {
-      if (!a.locked) return a;
-      const has = Boolean(getAlbumToken(a.key));
-      if (has === a.hasToken) return a;
-      changed = true;
-      return { ...a, hasToken: has };
-    });
-
-    if (!changed) return;
-
-    /* 同步更新分组里的同一批数据（groups 是渲染用的数据源） */
-    const byKey = new Map(next.map((a) => [a.key, a]));
-    this.setData({
-      allAlbums: next,
-      groups: this.data.groups.map((g) => ({
-        ...g,
-        albums: g.albums.map((a) => byKey.get(a.key) || a),
-      })),
-    });
+    this.loadAlbums();
   },
 
   onShareAppMessage() {
