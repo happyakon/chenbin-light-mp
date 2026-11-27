@@ -1,47 +1,8 @@
 <view class="collections-page">
   <!--
-    顶部轮播图（小程序独立的一套，3:2，最多 5 张）
-
-    全屏铺满：上、左、右三边直接顶到屏幕边缘，
-    图片延伸到状态栏下面（沉浸式）。
-    有轮播时不再渲染状态栏占位和「摄影集」标题，
-    让图片真正顶边；没有轮播时保持原来的标题布局。
-
-    和 Web 首页轮播分开设置：
-      Web     /api/hero      2.4:1
-      小程序   /api/mp-hero   3:2
+    加载骨架
+    （骨架期间不显示轮播，避免图片未就绪时上面空一块）
   -->
-  <swiper
-    wx:if="{{hero.length}}"
-    class="hero-swiper"
-    indicator-dots="{{hero.length > 1}}"
-    indicator-color="rgba(240,239,236,.28)"
-    indicator-active-color="rgba(201,168,106,.95)"
-    autoplay="{{hero.length > 1}}"
-    interval="4200"
-    duration="520"
-    circular
-  >
-    <swiper-item wx:for="{{hero}}" wx:key="path">
-      <image
-        class="hero-img"
-        src="{{item.medium}}"
-        mode="aspectFill"
-        lazy-load
-      />
-    </swiper-item>
-  </swiper>
-
-  <!-- 没有轮播时才要状态栏占位和标题 -->
-  <block wx:if="{{!hero.length}}">
-    <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
-
-    <view class="page-head">
-      <view class="page-title">摄影集</view>
-    </view>
-  </block>
-
-  <!-- 加载骨架 -->
   <scroll-view wx:if="{{loading}}" class="scroll-area" scroll-y>
     <view class="grid">
       <view wx:for="{{[1,2,3,4]}}" wx:key="*this" class="album skeleton-wrap">
@@ -55,21 +16,56 @@
   </scroll-view>
 
   <!--
-    按摄影集分组展示（和 Web 首页一样）
+    正文：轮播图 + 分组相册，整块一起滚动
 
-    每个摄影集一段：
-      01  风光摄影集
-          LANDSCAPE
-          ┌────┬────┐
-          │相册│相册│
-          └────┴────┘
-      02  儿童摄影集
-          ...
+    ★ 为什么轮播图要放进 scroll-view 里
+      之前轮播是固定元素、下面是独立的滚动区，
+      相册卡片往上滑时会「撞」在轮播下边缘，
+      半张卡片和图片直接贴在一起，视觉上很生硬。
 
-    去掉了顶部的「全部/风光/儿童/人像」筛选条，
-    改成一次性往下滚，分组标题就是分隔。
+      放进同一个滚动容器后，整页是连续的一张纸：
+      上滑时轮播跟着一起走，卡片自然从下面升上来，
+      没有硬边界。
   -->
   <scroll-view wx:else class="scroll-area" scroll-y>
+    <!--
+      轮播图（小程序独立的一套，3:2，最多 5 张）
+
+      上、左、右三边顶到屏幕边缘，图片延伸到状态栏下面（沉浸式）。
+      和 Web 首页轮播分开设置：
+        Web     /api/hero      2.4:1
+        小程序   /api/mp-hero   3:2
+    -->
+    <swiper
+      wx:if="{{hero.length}}"
+      class="hero-swiper"
+      indicator-dots="{{hero.length > 1}}"
+      indicator-color="rgba(240,239,236,.28)"
+      indicator-active-color="rgba(201,168,106,.95)"
+      autoplay="{{hero.length > 1}}"
+      interval="4200"
+      duration="520"
+      circular
+    >
+      <swiper-item wx:for="{{hero}}" wx:key="path">
+        <image
+          class="hero-img"
+          src="{{item.medium}}"
+          mode="aspectFill"
+          lazy-load
+        />
+      </swiper-item>
+    </swiper>
+
+    <!-- 没有轮播时才要状态栏占位和标题 -->
+    <block wx:if="{{!hero.length}}">
+      <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
+
+      <view class="page-head">
+        <view class="page-title">摄影集</view>
+      </view>
+    </block>
+
     <block wx:if="{{groups.length}}">
       <view
         wx:for="{{groups}}"

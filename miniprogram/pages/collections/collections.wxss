@@ -35,15 +35,13 @@
 /*
  * 3:2 横图，上左右三边顶到屏幕边缘（沉浸式）。
  *
- * 为什么不用 fix 定位：
- *   页面本身是 flex 列布局（status-bar / head / chips / scroll-area），
- *   只要把 swiper 放在最前面、去掉 margin 和圆角，
- *   再把状态栏占位一起省掉，它自然就顶边了。
+ * ★ 现在轮播图在 scroll-view 内部，跟着页面一起滚
+ *   之前它固定在滚动区外面，相册卡片往上滑时会撞在它下边缘，
+ *   半张卡片和图片直接贴住，视觉上很生硬。
  *
  * 高度按 3:2 算：全宽 750rpx → 500rpx。
  */
 .hero-swiper {
-  flex: 0 0 auto;
   width: 750rpx;
   height: 500rpx;
   margin: 0;
@@ -56,6 +54,11 @@
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* 轮播图和下面内容之间留一点呼吸空间，不要贴太死 */
+.hero-swiper + .collection-block {
+  padding-top: 24rpx;
 }
 
 /* ---------------------------------------------------------- 分组 */
