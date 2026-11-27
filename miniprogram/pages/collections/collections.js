@@ -115,6 +115,15 @@ Page({
           no: String(groups.length + 1).padStart(2, '0'),
           title: col.title || col.key,
           en: col.en || '',
+          /*
+           * 这一组有多少相册、多少张照片（和 Web 首页显示一致）。
+           * 后端 /api/collections 已经算好了，直接用。
+           * 相册数用可见相册的实际数量，避免和空组过滤后对不上。
+           */
+          albumCount: String(albums.length).padStart(2, '0'),
+          photoCount: String(
+            albums.reduce((n, a) => n + (Number(a.count) || 0), 0)
+          ).padStart(2, '0'),
           albums,
         });
       }

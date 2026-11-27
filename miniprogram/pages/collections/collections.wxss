@@ -109,6 +109,20 @@
   color: #7a7873;
 }
 
+/*
+ * 右侧统计：02 Albums · 35 Photos
+ * 用 margin-left:auto 推到最右，和 Web 首页的分组头一致。
+ */
+.collection-meta {
+  margin-left: auto;
+  font-family: var(--font-latin, "Helvetica Neue", Arial, sans-serif);
+  font-size: 19rpx;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6f6d69;
+  white-space: nowrap;
+}
+
 /* ---------------------------------------------------------- 滚动区 */
 
 .scroll-area {

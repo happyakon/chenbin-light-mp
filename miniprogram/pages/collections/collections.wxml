@@ -77,13 +77,14 @@
         wx:for-item="group"
         class="collection-block"
       >
-        <!-- 分组头：序号 + 中文标题 + 英文副标题 -->
+        <!-- 分组头：序号 + 中文标题 + 英文副标题 + 统计 -->
         <view class="collection-head">
           <text class="collection-no">{{group.no}}</text>
           <view class="collection-titles">
             <text class="collection-title">{{group.title}}</text>
             <text class="collection-en">{{group.en}}</text>
           </view>
+          <text class="collection-meta">{{group.albumCount}} Albums · {{group.photoCount}} Photos</text>
         </view>
 
         <!-- 该摄影集下的相册 -->
