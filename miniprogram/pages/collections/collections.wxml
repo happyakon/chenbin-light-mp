@@ -1,25 +1,21 @@
 <view class="collections-page">
-  <!-- 状态栏占位 -->
-  <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
-
-  <!-- 顶部标题 -->
-  <view class="page-head">
-    <view class="page-title">摄影集</view>
-  </view>
-
   <!--
-    轮播图（小程序独立的一套，3:2，最多 5 张）
+    顶部轮播图（小程序独立的一套，3:2，最多 5 张）
+
+    全屏铺满：上、左、右三边直接顶到屏幕边缘，
+    图片延伸到状态栏下面（沉浸式）。
+    有轮播时不再渲染状态栏占位和「摄影集」标题，
+    让图片真正顶边；没有轮播时保持原来的标题布局。
 
     和 Web 首页轮播分开设置：
       Web     /api/hero      2.4:1
       小程序   /api/mp-hero   3:2
-    控制台里是两个独立的入口。
   -->
   <swiper
     wx:if="{{hero.length}}"
     class="hero-swiper"
     indicator-dots="{{hero.length > 1}}"
-    indicator-color="rgba(240,239,236,.22)"
+    indicator-color="rgba(240,239,236,.28)"
     indicator-active-color="rgba(201,168,106,.95)"
     autoplay="{{hero.length > 1}}"
     interval="4200"
@@ -36,8 +32,22 @@
     </swiper-item>
   </swiper>
 
+  <!-- 没有轮播时才要状态栏占位和标题 -->
+  <block wx:if="{{!hero.length}}">
+    <view class="status-bar" style="height:{{statusBarHeight}}px"></view>
+
+    <view class="page-head">
+      <view class="page-title">摄影集</view>
+    </view>
+  </block>
+
   <!-- 横向筛选 chip -->
-  <scroll-view class="chips" scroll-x enable-flex show-scrollbar="{{false}}">
+  <scroll-view
+    class="chips {{hero.length ? 'has-hero' : ''}}"
+    scroll-x
+    enable-flex
+    show-scrollbar="{{false}}"
+  >
     <view
       wx:for="{{tabs}}"
       wx:key="key"

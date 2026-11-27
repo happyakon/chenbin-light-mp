@@ -33,16 +33,21 @@
 /* ---------------------------------------------------------- 轮播图 */
 
 /*
- * 3:2 横图。
- * 小程序不支持 vh，用 aspect-ratio 定高：
- * 宽度撑满（两侧 36rpx 边距，和标题对齐），高度自动 2/3。
+ * 3:2 横图，上左右三边顶到屏幕边缘（沉浸式）。
+ *
+ * 为什么不用 fix 定位：
+ *   页面本身是 flex 列布局（status-bar / head / chips / scroll-area），
+ *   只要把 swiper 放在最前面、去掉 margin 和圆角，
+ *   再把状态栏占位一起省掉，它自然就顶边了。
+ *
+ * 高度按 3:2 算：全宽 750rpx → 500rpx。
  */
 .hero-swiper {
   flex: 0 0 auto;
-  width: 678rpx; /* 750 - 36×2 */
-  height: 452rpx; /* 678 ÷ 1.5 */
-  margin: 8rpx auto 28rpx;
-  border-radius: 12rpx;
+  width: 750rpx;
+  height: 500rpx;
+  margin: 0;
+  border-radius: 0;
   overflow: hidden;
   background: #141414;
 }
@@ -51,6 +56,11 @@
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* 有轮播图时，chips 上面留一点距离（图片紧挨着筛选条太挤） */
+.chips.has-hero {
+  padding-top: 20rpx;
 }
 
 /* ------------------------------------------------ 横向筛选 chip */
