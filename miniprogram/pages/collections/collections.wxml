@@ -29,12 +29,12 @@
   -->
   <scroll-view wx:else class="scroll-area" scroll-y>
     <!--
-      轮播图（小程序独立的一套，3:2，最多 5 张）
+      轮播图（小程序独立的一套，4:3，最多 5 张）
 
       上、左、右三边顶到屏幕边缘，图片延伸到状态栏下面（沉浸式）。
       和 Web 首页轮播分开设置：
         Web     /api/hero      2.4:1
-        小程序   /api/mp-hero   3:2
+        小程序   /api/mp-hero   4:3
     -->
     <swiper
       wx:if="{{hero.length}}"
